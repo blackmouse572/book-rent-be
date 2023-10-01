@@ -18,15 +18,11 @@ async function bootstrap() {
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   await initSwagger(app);
-  logger.log('************************************');
+  logger.log('\n************************************');
   logger.log(`Server is running on ${prefix}:${port}`);
   await app.listen(port);
-  logger.log('************************************');
+  logger.log('\n************************************');
   logger.log(`Database is running on ${databaseUrl}`);
-  logger.log('************************************');
-  logger.log(`Environment Variable`, 'NestApplication');
-  logger.log(JSON.parse(JSON.stringify(process.env)), 'NestApplication');
-
   logger.log('************************************');
 }
 bootstrap();

@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import { ENUM_APP_ENVIROMENT } from '../lib/swagger.constraint';
+import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 
 export default registerAs(
   'app',
