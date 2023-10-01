@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import Joi from 'joi';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import configs from './configs';
-import { ENUM_APP_ENVIROMENT } from './lib/swagger.constraint';
+import { AppController } from 'src/app.controller';
+import { AppService } from 'src/app.service';
+import configs from 'src/configs';
+import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 
 @Module({
   imports: [
