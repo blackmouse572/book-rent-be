@@ -4,11 +4,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import Joi from 'joi';
 import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
-import { DATABASE_CONNECTION_NAME } from 'src/common/database/constraints/database.constraint';
+import { DATABASE_CONNECTION_NAME } from 'src/common/database/constants/database.constraint';
 import { DatabaseOptionsModule } from 'src/common/database/database.options.module';
 import { DatabaseOptionsService } from 'src/common/database/service/database.options.service';
 import configs from 'src/configs';
 import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [
@@ -95,6 +96,7 @@ import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
             useFactory: (databaseOptionsService: DatabaseOptionsService) =>
                 databaseOptionsService.createOptions(),
         }),
+        AuthModule,
     ],
     controllers: [AppController],
     providers: [AppService],
