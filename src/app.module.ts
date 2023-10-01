@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 import Joi from 'joi';
 import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
+import { DATABASE_CONNECTION_NAME } from 'src/common/database/constraints/database.constraint';
+import { DatabaseOptionsModule } from 'src/common/database/database.options.module';
+import { DatabaseOptionsService } from 'src/common/database/service/database.options.service';
 import configs from 'src/configs';
 import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 
@@ -77,6 +81,13 @@ import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
         allowUnknown: true,
         abortEarly: true,
       },
+    }),
+    MongooseModule.forRootAsync({
+      connectionName: DATABASE_CONNECTION_NAME,
+      imports: [DatabaseOptionsModule],
+      inject: [DatabaseOptionsService],
+      useFactory: (databaseOptionsService: DatabaseOptionsService) =>
+        databaseOptionsService.createOptions(),
     }),
   ],
   controllers: [AppController],
