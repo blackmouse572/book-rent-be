@@ -10,6 +10,7 @@ import { DatabaseOptionsService } from 'src/common/database/service/database.opt
 import configs from 'src/configs';
 import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 import { AuthModule } from './auth/auth.module';
+import { HelpersModule } from './common/helpers/helpers.module';
 
 @Module({
     imports: [
@@ -96,7 +97,8 @@ import { AuthModule } from './auth/auth.module';
             useFactory: (databaseOptionsService: DatabaseOptionsService) =>
                 databaseOptionsService.createOptions(),
         }),
-        AuthModule,
+        AuthModule.forRoot(),
+        HelpersModule,
     ],
     controllers: [AppController],
     providers: [AppService],

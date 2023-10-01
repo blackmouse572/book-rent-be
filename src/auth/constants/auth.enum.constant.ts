@@ -1,5 +1,7 @@
 enum ENUM_AUTH_LOGIN_WITH {
-    credentials = 'credentials',
+    CREDENTIALS = 'CREDENTIALS',
+    GITHUB = 'GITHUB',
+    GOOGLE = 'GOOGLE',
 }
 
 export { ENUM_AUTH_LOGIN_WITH };
