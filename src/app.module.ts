@@ -11,6 +11,7 @@ import configs from 'src/configs';
 import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 import { AuthModule } from './auth/auth.module';
 import { HelpersModule } from './common/helpers/helpers.module';
+import { PaginationModule } from './pagination/pagination.module';
 
 @Module({
     imports: [
@@ -99,6 +100,7 @@ import { HelpersModule } from './common/helpers/helpers.module';
         }),
         AuthModule.forRoot(),
         HelpersModule,
+        PaginationModule,
     ],
     controllers: [AppController],
     providers: [AppService],
