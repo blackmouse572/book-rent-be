@@ -48,6 +48,7 @@ export class UserEntity extends DatabaseMongoObjectIdEntityAbstract {
         trim: true,
         type: String,
         maxlength: 255,
+        default: ''
     })
     address?: string;
 

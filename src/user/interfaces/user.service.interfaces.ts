@@ -9,7 +9,7 @@ import {
     IDatabaseSaveOptions,
 } from 'src/common/database/interfaces/database.interface';
 import { UserCreateDto } from 'src/user/dtos/create-user.dto';
-import { UserUpdateNameDto } from 'src/user/dtos/update-name.dto';
+import { UserUpdateDto } from 'src/user/dtos/update-name.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
 import { UserDoc, UserEntity } from 'src/user/repository/user.entity';
 
@@ -62,7 +62,7 @@ export interface IUserService {
     ): Promise<UserDoc>;
     updateName(
         repository: UserDoc,
-        { fullName }: UserUpdateNameDto,
+        { fullName }: UserUpdateDto,
         options?: IDatabaseSaveOptions
     ): Promise<UserDoc>;
     updatePassword(

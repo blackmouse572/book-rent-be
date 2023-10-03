@@ -5,7 +5,7 @@ import { HelpersModule } from 'src/common/helpers/helpers.module';
 import { UserEntity, UserSchema } from 'src/user/repository/user.entity';
 import { UserRepository } from 'src/user/repository/user.repository';
 import { UserService } from 'src/user/services/user.service';
-import { UserController } from 'src/user/user.controller';
+import { UserController } from 'src/user/controllers/user.controller';
 
 @Module({
     controllers: [UserController],
