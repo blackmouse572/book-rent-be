@@ -7,11 +7,13 @@ import {
     HttpCode,
     HttpStatus,
     NotFoundException,
+    Patch,
     Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ENUM_AUTH_LOGIN_WITH } from 'src/auth/constants/auth.enum.constant';
 import {
+    AuthJwtAccessProtected,
     AuthJwtRefreshProtected,
     AuthJwtToken,
 } from 'src/auth/decorators/auth.jwt.decorator';
@@ -218,11 +220,15 @@ export class AuthController {
         );
         return { data: { tokenType, expiresIn, accessToken, refreshToken } };
     }
+
     @ApiOperation({
         tags: ['user', 'password'],
         summary: 'Change password',
         description: 'Change account password',
     })
+    @UserProtected()
+    @AuthJwtAccessProtected()
+    @Patch('/change-password')
     async changePassword(
         @Body() body: UserChangePasswordDto,
         @GetUser() user: UserDoc
