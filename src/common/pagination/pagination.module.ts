@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PaginationService } from './pagination.service';
+import { PaginationService } from 'src/common/pagination/services/pagination.service';
 
 @Module({
     providers: [PaginationService],
