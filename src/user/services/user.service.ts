@@ -12,7 +12,7 @@ import {
 } from 'src/common/database/interfaces/database.interface';
 import { HelperDateService } from 'src/common/helpers/services/helper.date.service';
 import { UserCreateDto } from 'src/user/dtos/create-user.dto';
-import { UserUpdateNameDto } from 'src/user/dtos/update-name.dto';
+import { UserUpdateDto } from 'src/user/dtos/update-user.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
 import { IUserService } from 'src/user/interfaces/user.service.interfaces';
 import { UserDoc, UserEntity } from 'src/user/repository/user.entity';
@@ -150,11 +150,20 @@ export class UserService implements IUserService {
 
     async updateName(
         repository: UserDoc,
-        { fullName }: UserUpdateNameDto,
+        { fullName }: UserUpdateDto,
         options?: IDatabaseSaveOptions
     ): Promise<UserDoc> {
         repository.fullName = fullName;
 
+        return this.userRepository.save(repository, options);
+    }
+
+    async updateAddress(
+        repository: UserDoc,
+        { address }: UserUpdateDto,
+        options?: IDatabaseSaveOptions
+    ) {
+        repository.address = address;
         return this.userRepository.save(repository, options);
     }
 

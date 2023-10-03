@@ -4,16 +4,17 @@ import { UserDoc } from 'src/user/repository/user.entity';
 import { UserService } from 'src/user/services/user.service';
 
 @Injectable()
-export class UserPayloadPutToRequestGuard implements CanActivate {
-    constructor(private readonly userService: UserService) { }
+export class UserPutToRequestGuard implements CanActivate {
+    constructor(private readonly userService: UserService) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context
             .switchToHttp()
             .getRequest<IRequestApp & { __user: UserDoc }>();
-        const { user } = request;
+        const { params } = request;
+        const { user } = params;
 
-        const check: UserDoc = await this.userService.findOneById(user.user_id, {
+        const check: UserDoc = await this.userService.findOneById(user, {
             join: true,
         });
         request.__user = check;
