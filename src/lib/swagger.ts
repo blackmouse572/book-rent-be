@@ -7,7 +7,6 @@ import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 export default async function initSwagger(app: NestApplication) {
     const configService = app.get(ConfigService);
     const env: string = configService.get<string>('app.env');
-    const logger = new Logger('Swagger');
 
     const docTitle: string = configService.get<string>('doc.name');
     const docDescription: string = configService.get<string>('doc.description');
@@ -20,9 +19,6 @@ export default async function initSwagger(app: NestApplication) {
             .setDescription(docDescription)
             .setVersion(docVersion)
             .addTag('API')
-            .addServer('/')
-            .addServer('/staging')
-            .addServer('/prod')
             .addBearerAuth(
                 {
                     type: 'http',

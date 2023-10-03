@@ -7,7 +7,7 @@ export class AuthJwtAccessGuard extends AuthGuard('jwt') {
         if (err || !user) {
             throw new UnauthorizedException({
                 statusCode: 404,
-                message: 'auth.error.accessTokenUnauthorized',
+                message: 'Access Token Invalid',
                 _error: err ? err.message : info.message,
             });
         }
