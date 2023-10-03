@@ -1,9 +1,10 @@
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestApplication, NestFactory } from '@nestjs/core';
-import { useContainer } from 'class-validator';
+import { Validator, useContainer } from 'class-validator';
 import { AppModule } from './app.module';
 import initSwagger from './lib/swagger';
+
 async function bootstrap() {
     const app: NestApplication = await NestFactory.create(AppModule);
     const configService = app.get(ConfigService);
@@ -14,7 +15,10 @@ async function bootstrap() {
 
     const logger = new Logger();
     process.env.NODE_ENV = env;
+
+    //Global
     app.setGlobalPrefix(prefix);
+    app.useGlobalPipes(new ValidationPipe())
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
     await initSwagger(app);
