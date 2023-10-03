@@ -21,5 +21,7 @@ export class UserManageController {
     })
     @AuthJwtAdminAccessProtected()
     @Get('/list')
-    async list() {}
+    async list() {
+        return { status: 'OK' };
+    }
 }

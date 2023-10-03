@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { AuthJwtAccessGuard } from 'src/auth/guards/jwt-access-token/auth.access-token.guard';
 import { AuthJwtRefreshGuard } from 'src/auth/guards/jwt-refresh-token/auth.refresh-token.guard';
+import { RolePayloadTypeGuard } from 'src/auth/guards/role.payload.type.guard';
 import { ROLE_TYPE_META_KEY } from 'src/user/constants/user.constants';
 import { ENUM_ROLE_TYPE } from 'src/user/constants/user.enum.constants';
 
@@ -37,7 +38,7 @@ export function AuthJwtRefreshProtected(): MethodDecorator {
 
 export function AuthJwtAdminAccessProtected(): MethodDecorator {
     return applyDecorators(
-        UseGuards(AuthJwtAccessGuard),
+        UseGuards(AuthJwtAccessGuard, RolePayloadTypeGuard),
         SetMetadata(ROLE_TYPE_META_KEY, [
             ENUM_ROLE_TYPE.ADMIN,
             ENUM_ROLE_TYPE.SUPER_ADMIN,
@@ -47,7 +48,7 @@ export function AuthJwtAdminAccessProtected(): MethodDecorator {
 
 export function AuthJwtSuperAdminAccessProtected(): MethodDecorator {
     return applyDecorators(
-        UseGuards(AuthJwtAccessGuard),
+        UseGuards(AuthJwtAccessGuard, RolePayloadTypeGuard),
         SetMetadata(ROLE_TYPE_META_KEY, [ENUM_ROLE_TYPE.SUPER_ADMIN])
     );
 }
