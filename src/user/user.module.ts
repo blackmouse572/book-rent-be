@@ -6,12 +6,15 @@ import { UserEntity, UserSchema } from 'src/user/repository/user.entity';
 import { UserRepository } from 'src/user/repository/user.repository';
 import { UserService } from 'src/user/services/user.service';
 import { UserController } from 'src/user/controllers/user.controller';
+import { UserManageController } from 'src/user/controllers/user.manage.controller';
+import { PaginationModule } from 'src/common/pagination/pagination.module';
 
 @Module({
-    controllers: [UserController],
+    controllers: [UserController, UserManageController],
     providers: [UserService, UserRepository],
     exports: [UserService],
     imports: [
+        PaginationModule,
         HelpersModule,
         MongooseModule.forFeature(
             [
@@ -24,4 +27,4 @@ import { UserController } from 'src/user/controllers/user.controller';
         ),
     ],
 })
-export class UserModule { }
+export class UserModule {}

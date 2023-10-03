@@ -5,6 +5,7 @@ import {
 } from 'mongoose';
 import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
+import { ENUM_ROLE_TYPE } from 'src/user/constants/user.enum.constants';
 
 export const UserDatabaseName = 'users';
 
@@ -48,7 +49,7 @@ export class UserEntity extends DatabaseMongoObjectIdEntityAbstract {
         trim: true,
         type: String,
         maxlength: 255,
-        default: ''
+        default: '',
     })
     address?: string;
 
@@ -61,6 +62,14 @@ export class UserEntity extends DatabaseMongoObjectIdEntityAbstract {
         maxlength: 15,
     })
     phone: string;
+
+    @Prop({
+        required: true,
+        default: ENUM_ROLE_TYPE.USER,
+        enum: ENUM_ROLE_TYPE,
+        type: String,
+    })
+    role: ENUM_ROLE_TYPE;
 
     @Prop({
         trim: true,

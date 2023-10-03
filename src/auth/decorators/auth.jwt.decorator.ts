@@ -2,10 +2,13 @@ import {
     applyDecorators,
     createParamDecorator,
     ExecutionContext,
+    SetMetadata,
     UseGuards,
 } from '@nestjs/common';
 import { AuthJwtAccessGuard } from 'src/auth/guards/jwt-access-token/auth.access-token.guard';
 import { AuthJwtRefreshGuard } from 'src/auth/guards/jwt-refresh-token/auth.refresh-token.guard';
+import { ROLE_TYPE_META_KEY } from 'src/user/constants/user.constants';
+import { ENUM_ROLE_TYPE } from 'src/user/constants/user.enum.constants';
 
 export const AuthJwtPayload = createParamDecorator(
     (data: string, ctx: ExecutionContext): Record<string, any> => {
@@ -30,4 +33,21 @@ export function AuthJwtAccessProtected(): MethodDecorator {
 
 export function AuthJwtRefreshProtected(): MethodDecorator {
     return applyDecorators(UseGuards(AuthJwtRefreshGuard));
+}
+
+export function AuthJwtAdminAccessProtected(): MethodDecorator {
+    return applyDecorators(
+        UseGuards(AuthJwtAccessGuard),
+        SetMetadata(ROLE_TYPE_META_KEY, [
+            ENUM_ROLE_TYPE.ADMIN,
+            ENUM_ROLE_TYPE.SUPER_ADMIN,
+        ])
+    );
+}
+
+export function AuthJwtSuperAdminAccessProtected(): MethodDecorator {
+    return applyDecorators(
+        UseGuards(AuthJwtAccessGuard),
+        SetMetadata(ROLE_TYPE_META_KEY, [ENUM_ROLE_TYPE.SUPER_ADMIN])
+    );
 }

@@ -86,6 +86,7 @@ export class AuthController {
         const payload = {
             user_id: user.id,
             user_phone: user.phone,
+            type: user.role,
         };
 
         const expiresIn: number =
@@ -189,6 +190,7 @@ export class AuthController {
         const payload = {
             user_id: user.id,
             user_phone: user.phone,
+            type: user.role,
         };
 
         const expiresIn: number =
