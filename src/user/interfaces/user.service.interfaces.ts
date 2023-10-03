@@ -9,7 +9,7 @@ import {
     IDatabaseSaveOptions,
 } from 'src/common/database/interfaces/database.interface';
 import { UserCreateDto } from 'src/user/dtos/create-user.dto';
-import { UserUpdateDto } from 'src/user/dtos/update-name.dto';
+import { UserUpdateDto } from 'src/user/dtos/update-user.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
 import { UserDoc, UserEntity } from 'src/user/repository/user.entity';
 
