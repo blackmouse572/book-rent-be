@@ -1,5 +1,7 @@
 import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { AuthController } from 'src/auth/controllers/auth.controller';
+import { AuthJwtAccessStrategy } from 'src/auth/guards/jwt-access-token/auth.access-token.strategy';
+import { AuthJwtRefreshStrategy } from 'src/auth/guards/jwt-refresh-token/auth.refresh-token.strategy';
 import { AuthService } from 'src/auth/services/auth.service';
 import { HelpersModule } from 'src/common/helpers/helpers.module';
 import { UserModule } from 'src/user/user.module';
@@ -12,7 +14,10 @@ import { UserModule } from 'src/user/user.module';
 })
 export class AuthModule {
     static forRoot(): DynamicModule {
-        const providers: Provider<any>[] = [];
+        const providers: Provider<any>[] = [
+            AuthJwtAccessStrategy,
+            AuthJwtRefreshStrategy,
+        ];
         return {
             module: AuthModule,
             providers: providers,

@@ -1,9 +1,11 @@
 import { BadRequestException, Body, ConflictException, Controller, ForbiddenException, HttpCode, HttpStatus, NotFoundException, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ENUM_AUTH_LOGIN_WITH } from 'src/auth/constants/auth.enum.constant';
+import { AuthJwtRefreshProtected, AuthJwtToken } from 'src/auth/decorators/auth.jwt.decorator';
 import { UserLoginDto } from 'src/auth/dto/user-login.dto';
 import { UserSignUpDto } from 'src/auth/dto/user-signup.dto';
 import { AuthService } from 'src/auth/services/auth.service';
+import { GetUser, UserAuthProtected, UserProtected } from 'src/user/decorators/user.decorator';
 import { UserDoc } from 'src/user/repository/user.entity';
 import { UserService } from 'src/user/services/user.service';
 
@@ -24,7 +26,6 @@ export class AuthController {
     async login(@Body() { password, usernameOrEmail }: UserLoginDto) {
         const _userEmailDoc: UserDoc | null = await this.userService.findOneByEmail(usernameOrEmail);
         const _userUsernameDoc: UserDoc | null = await this.userService.findOneByUsername(usernameOrEmail);
-        console.log(_userEmailDoc, _userUsernameDoc)
         const user = _userEmailDoc ?? _userUsernameDoc;
 
         if (!user) {
@@ -135,5 +136,61 @@ export class AuthController {
         }, password)
 
         return;
+    }
+
+    @ApiOperation({
+        tags: ['refresh', 'jwt'],
+        description: "Revoke new access token using refresh token",
+        summary: "Get new access token"
+    })
+    @HttpCode(HttpStatus.OK)
+    @UserAuthProtected()
+    @UserProtected()
+    @AuthJwtRefreshProtected()
+    @Post('refresh')
+    async refresh(
+        @AuthJwtToken() refreshToken: string,
+        @GetUser() user: UserDoc,
+    ) {
+        const payload = {
+            user_id: user.id,
+            user_phone: user.phone,
+        }
+
+        const expiresIn: number = await this.authService.getAccessTokenExpirationTime();
+        const tokenType: string = await this.authService.getTokenType();
+        const payloadAccessToken = await this.authService.createPayloadAccessToken(payload)
+        const payloadRefreshToken = await this.authService.createPayloadRefreshToken(payload.user_id, {
+            loginWith: ENUM_AUTH_LOGIN_WITH.CREDENTIALS
+        });
+
+
+        const payloadEncryption = await this.authService.getPayloadEncryption()
+
+        let payloadHashedAccessToken: Record<string, any> | string =
+            payloadAccessToken;
+        let payloadHashedRefreshToken: Record<string, any> | string =
+            payloadRefreshToken;
+
+        if (payloadEncryption) {
+            payloadHashedAccessToken =
+                await this.authService.encryptAccessToken(payloadAccessToken);
+            payloadHashedRefreshToken =
+                await this.authService.encryptRefreshToken(payloadRefreshToken);
+        }
+
+        const accessToken: string = await this.authService.createAccessToken(
+            payloadHashedAccessToken
+        );
+
+
+        return {
+            data: {
+                tokenType,
+                expiresIn,
+                accessToken,
+                refreshToken,
+            },
+        };
     }
 }
