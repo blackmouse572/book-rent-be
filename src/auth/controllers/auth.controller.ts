@@ -33,7 +33,13 @@ export class AuthController {
                 message: "User not found",
             })
         }
+        const maxPasswordAttemp = 5;
 
+        if (user.passwordAttempt >= maxPasswordAttemp) {
+            throw new ForbiddenException({
+                message: "Max password attemps"
+            })
+        }
         const validate: boolean = await this.authService.validateUser(
             password,
             user.password
