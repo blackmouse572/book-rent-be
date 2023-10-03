@@ -3,5 +3,6 @@ import { PaginationService } from './pagination.service';
 
 @Module({
     providers: [PaginationService],
+    exports: [PaginationService],
 })
-export class PaginationModule { }
+export class PaginationModule {}
