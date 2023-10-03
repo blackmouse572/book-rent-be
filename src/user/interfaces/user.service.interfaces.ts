@@ -31,7 +31,7 @@ export interface IUserService {
         email: string,
         options?: IDatabaseFindOneOptions
     ): Promise<T>;
-    findOneByMobileNumber<T>(
+    findOneByPhoneNumber<T>(
         mobileNumber: string,
         options?: IDatabaseFindOneOptions
     ): Promise<T>;
@@ -48,7 +48,7 @@ export interface IUserService {
         email: string,
         options?: IDatabaseExistOptions
     ): Promise<boolean>;
-    existByMobileNumber(
+    existByPhoneNumber(
         mobileNumber: string,
         options?: IDatabaseExistOptions
     ): Promise<boolean>;
