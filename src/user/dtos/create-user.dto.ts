@@ -5,6 +5,7 @@ import {
     IsEmail,
     IsNotEmpty,
     IsOptional,
+    IsPhoneNumber,
     IsString,
     MaxLength,
     MinLength,
@@ -38,7 +39,6 @@ export class UserCreateDto {
         required: true,
     })
     @IsString()
-    @IsOptional()
     @MinLength(10)
     @MaxLength(14)
     @ValidateIf((e) => e.mobileNumber !== '')
@@ -53,6 +53,18 @@ export class UserCreateDto {
         required: true,
     })
     @IsNotEmpty()
+    @IsString()
+    @MinLength(6)
     @MaxLength(50)
+    @Type(() => String)
     readonly password: string;
+
+    @ApiProperty({
+        example: faker.internet.userName,
+        required: true,
+    })
+    @IsString()
+    @MinLength(6)
+    @MaxLength(100)
+    readonly username: string;
 }
