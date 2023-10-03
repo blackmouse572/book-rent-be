@@ -129,8 +129,5 @@ export const UserSchema = SchemaFactory.createForClass(UserEntity);
 export type UserDoc = HydratedDocument<UserEntity>;
 
 UserSchema.pre('save', function (next: CallbackWithoutResultAndOptionalError) {
-    this.email = this.email.toLowerCase();
-    this.username = this.username.toLowerCase();
-
     next();
 });
