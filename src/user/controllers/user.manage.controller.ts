@@ -8,6 +8,7 @@ import {
 } from 'src/common/pagination/decorators/pagination.decorator';
 import { PaginationListDto } from 'src/common/pagination/dto/pagination.list.dto';
 import { PaginationService } from 'src/common/pagination/services/pagination.service';
+import { RequestParamGuard } from 'src/lib/guards/request.decorator';
 import { ENUM_ROLE_TYPE } from 'src/user/constants/user.enum.constants';
 import {
     USER_DEFAULT_AVAILABLE_ORDER_BY,
@@ -20,7 +21,11 @@ import {
     USER_DEFAULT_PER_PAGE,
     USER_DEFAULT_ROLE,
 } from 'src/user/constants/user.list-constants';
-import { IUserEntity } from 'src/user/interfaces/user.interface';
+import { UserAdminGetGuard } from 'src/user/decorators/user.admin.decorator';
+import { GetUser, UserProtected } from 'src/user/decorators/user.decorator';
+import { UserRequestDto } from 'src/user/dtos/get-user.dto';
+import { IUserDoc, IUserEntity } from 'src/user/interfaces/user.interface';
+import { UserDoc } from 'src/user/repository/user.entity';
 import { UserService } from 'src/user/services/user.service';
 @ApiTags('modules.admin.user')
 @Controller({
@@ -87,5 +92,13 @@ export class UserManageController {
             _pagination: { total, totalPage },
             data: users,
         };
+    }
+
+    @UserAdminGetGuard()
+    @RequestParamGuard(UserRequestDto)
+    @AuthJwtAdminAccessProtected()
+    @Get('/get/:user')
+    async get(@GetUser() user: UserDoc): Promise<any> {
+        return { data: user.toObject() };
     }
 }
