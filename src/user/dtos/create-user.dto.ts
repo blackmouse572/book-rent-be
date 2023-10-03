@@ -67,4 +67,12 @@ export class UserCreateDto {
     @MinLength(6)
     @MaxLength(100)
     readonly username: string;
+
+    @ApiProperty({
+        example: faker.location.streetAddress({ useFullAddress: true }),
+        required: false,
+    })
+    @IsString()
+    @IsOptional()
+    readonly address?: string;
 }

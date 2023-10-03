@@ -8,7 +8,7 @@ export function PaginationFilterInEnumPipe<T>(
     field: string,
     defaultValue: T,
     defaultEnum: Record<string, any>,
-    raw: boolean
+    raw?: boolean
 ): Type<PipeTransform> {
     @Injectable({ scope: Scope.REQUEST })
     class MixinPaginationFilterInEnumPipe implements PipeTransform {
