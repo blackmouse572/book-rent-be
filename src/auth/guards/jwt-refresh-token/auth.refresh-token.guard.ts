@@ -7,7 +7,7 @@ export class AuthJwtRefreshGuard extends AuthGuard('jwtRefresh') {
         if (err || !user) {
             throw new UnauthorizedException({
                 statusCode: 404,
-                message: 'auth.error.refreshTokenUnauthorized',
+                message: 'Refresh Token Unauthorized',
                 _error: err ? err.message : info.message,
             });
         }

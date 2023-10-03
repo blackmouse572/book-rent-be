@@ -7,11 +7,12 @@ import { AppService } from 'src/app.service';
 import { DATABASE_CONNECTION_NAME } from 'src/common/database/constants/database.constraint';
 import { DatabaseOptionsModule } from 'src/common/database/database.options.module';
 import { DatabaseOptionsService } from 'src/common/database/service/database.options.service';
+import { PaginationModule } from 'src/common/pagination/pagination.module';
 import configs from 'src/configs';
 import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 import { AuthModule } from './auth/auth.module';
 import { HelpersModule } from './common/helpers/helpers.module';
-import { PaginationModule } from './pagination/pagination.module';
+import { UserModule } from './user/user.module';
 
 @Module({
     imports: [
@@ -98,9 +99,10 @@ import { PaginationModule } from './pagination/pagination.module';
             useFactory: (databaseOptionsService: DatabaseOptionsService) =>
                 databaseOptionsService.createOptions(),
         }),
-        AuthModule.forRoot(),
         HelpersModule,
+        AuthModule.forRoot(),
         PaginationModule,
+        UserModule,
     ],
     controllers: [AppController],
     providers: [AppService],
