@@ -11,7 +11,6 @@ import {
     IDatabaseSaveOptions,
 } from 'src/common/database/interfaces/database.interface';
 import { HelperDateService } from 'src/common/helpers/services/helper.date.service';
-import { HelperStringService } from 'src/common/helpers/services/helper.string.service';
 import { UserCreateDto } from 'src/user/dtos/create-user.dto';
 import { UserUpdateNameDto } from 'src/user/dtos/update-name.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
@@ -26,7 +25,6 @@ export class UserService implements IUserService {
     constructor(
         private readonly userRepository: UserRepository,
         private readonly helperDateService: HelperDateService,
-        private readonly helperStringService: HelperStringService,
         private readonly configService: ConfigService
     ) {
         this.authMaxPasswordAttempt = this.configService.get<number>(
@@ -72,11 +70,11 @@ export class UserService implements IUserService {
         return this.userRepository.findOne<T>({ email }, options);
     }
 
-    async findOneByMobileNumber<T>(
-        mobileNumber: string,
+    async findOneByPhoneNumber<T>(
+        phone: string,
         options?: IDatabaseFindOneOptions
     ): Promise<T> {
-        return this.userRepository.findOne<T>({ mobileNumber }, options);
+        return this.userRepository.findOne<T>({ phone }, options);
     }
 
     async getTotal(
@@ -87,12 +85,13 @@ export class UserService implements IUserService {
     }
 
     async create(
-        { email, fullName, phone }: UserCreateDto,
+        { email, fullName, phone, username }: UserCreateDto,
         { passwordHash, salt }: IAuthPassword,
         options?: IDatabaseCreateOptions
     ): Promise<UserDoc> {
         const create: UserEntity = new UserEntity();
         create.email = email;
+        create.username = username;
         create.password = passwordHash;
         create.fullName = fullName;
         create.phone = phone;
@@ -120,13 +119,13 @@ export class UserService implements IUserService {
         );
     }
 
-    async existByMobileNumber(
-        mobileNumber: string,
+    async existByPhoneNumber(
+        phone: string,
         options?: IDatabaseExistOptions
     ): Promise<boolean> {
         return this.userRepository.exists(
             {
-                mobileNumber,
+                phone,
             },
             { ...options, withDeleted: true }
         );
