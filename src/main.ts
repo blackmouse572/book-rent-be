@@ -4,6 +4,7 @@ import { NestApplication, NestFactory } from '@nestjs/core';
 import { Validator, useContainer } from 'class-validator';
 import { AppModule } from './app.module';
 import initSwagger from './lib/swagger';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
     const app: NestApplication = await NestFactory.create(AppModule);
@@ -19,6 +20,7 @@ async function bootstrap() {
     //Global
     app.setGlobalPrefix(prefix);
     app.useGlobalPipes(new ValidationPipe());
+    app.use(cookieParser);
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
     //CORS
@@ -35,6 +37,8 @@ async function bootstrap() {
             'Access-Control-Request-Headers',
             'X-Api-Key',
             'x-api-key',
+            'x-refresh-token',
+            'Authorization',
         ],
         credentials: true,
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

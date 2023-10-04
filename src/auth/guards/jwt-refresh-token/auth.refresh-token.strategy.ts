@@ -14,9 +14,12 @@ export class AuthJwtRefreshStrategy extends PassportStrategy(
         private readonly authService: AuthService
     ) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme(
-                configService.get<string>('auth.prefixAuthorization')
-            ),
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                authService.refreshTokenExtractor,
+                ExtractJwt.fromAuthHeaderWithScheme(
+                    configService.get<string>('auth.prefixAuthorization')
+                ),
+            ]),
             ignoreExpiration: false,
             jsonWebTokenOptions: {
                 ignoreNotBefore: false,

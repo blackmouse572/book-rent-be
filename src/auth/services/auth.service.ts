@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 import {
     IAuthPassword,
     IAuthPayloadOptions,
@@ -262,5 +263,13 @@ export class AuthService implements IAuthService {
 
     async getPayloadEncryption(): Promise<boolean> {
         return this.payloadEncryption;
+    }
+
+    refreshTokenExtractor(req: Request) {
+        let refreshToken: string = null;
+        if (req && req.cookies) {
+            refreshToken = req.cookies['x-refresh-token'];
+        }
+        return refreshToken;
     }
 }

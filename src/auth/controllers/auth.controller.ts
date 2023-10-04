@@ -9,7 +9,9 @@ import {
     NotFoundException,
     Patch,
     Post,
+    Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ENUM_AUTH_LOGIN_WITH } from 'src/auth/constants/auth.enum.constant';
 import {
@@ -185,7 +187,8 @@ export class AuthController {
     @Post('refresh')
     async refresh(
         @AuthJwtToken() refreshToken: string,
-        @GetUser() user: UserDoc
+        @GetUser() user: UserDoc,
+        @Res({ passthrough: true }) res: Response
     ) {
         const payload = {
             user_id: user.id,
@@ -220,6 +223,13 @@ export class AuthController {
         const accessToken: string = await this.authService.createAccessToken(
             payloadHashedAccessToken
         );
+        //Attach the refresh token to the cookies
+        res.cookie('x-refresh-token', refreshToken, {
+            expires: new Date(Date.now() + expiresIn * 1000),
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+        });
+
         return { data: { tokenType, expiresIn, accessToken, refreshToken } };
     }
 
