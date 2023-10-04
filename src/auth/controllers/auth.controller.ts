@@ -49,7 +49,10 @@ export class AuthController {
         description: 'Login with local credentials',
     })
     @Post('login')
-    async login(@Body() { password, usernameOrEmail }: UserLoginDto) {
+    async login(
+        @Body() { password, usernameOrEmail }: UserLoginDto,
+        @Res({ passthrough: true }) res: Response
+    ) {
         const _userEmailDoc: UserDoc | null =
             await this.userService.findOneByEmail(usernameOrEmail);
         const _userUsernameDoc: UserDoc | null =
@@ -86,8 +89,8 @@ export class AuthController {
         await this.userService.resetPasswordAttempt(user);
 
         const payload = {
-            user_id: user.id,
-            user_phone: user.phone,
+            _id: user.id,
+            phone: user.phone,
             type: user.role,
         };
 
@@ -97,7 +100,7 @@ export class AuthController {
         const payloadAccessToken =
             await this.authService.createPayloadAccessToken(payload);
         const payloadRefreshToken =
-            await this.authService.createPayloadRefreshToken(payload.user_id, {
+            await this.authService.createPayloadRefreshToken(payload._id, {
                 loginWith: ENUM_AUTH_LOGIN_WITH.CREDENTIALS,
             });
 
@@ -120,8 +123,18 @@ export class AuthController {
         );
 
         const refreshToken: string = await this.authService.createRefreshToken(
-            payloadHashedRefreshToken
+            payloadHashedRefreshToken,
+            {
+                notBeforeExpirationTime: 0,
+            }
         );
+
+        res.cookie('x-refresh-token', refreshToken, {
+            expires: new Date(Date.now() + expiresIn * 24 * 60 * 60),
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+        });
+
         return {
             data: {
                 tokenType,
@@ -217,7 +230,7 @@ export class AuthController {
         );
         //Attach the refresh token to the cookies
         res.cookie('x-refresh-token', refreshToken, {
-            expires: new Date(Date.now() + expiresIn * 1000),
+            expires: new Date(Date.now() + expiresIn * 23 * 60 * 60),
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
         });

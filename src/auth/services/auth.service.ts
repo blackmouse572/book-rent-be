@@ -114,7 +114,7 @@ export class AuthService implements IAuthService {
             {
                 secretKey: this.accessTokenSecretKey,
                 expiredIn: this.accessTokenExpirationTime,
-                notBefore: this.accessTokenNotBeforeExpirationTime,
+                // notBefore: this.accessTokenNotBeforeExpirationTime,
                 audience: this.audience,
                 issuer: this.issuer,
                 subject: this.subject,

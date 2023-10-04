@@ -22,7 +22,7 @@ export class AuthJwtRefreshStrategy extends PassportStrategy(
             ]),
             ignoreExpiration: false,
             jsonWebTokenOptions: {
-                ignoreNotBefore: false,
+                // ignoreNotBefore: false,
                 audience: configService.get<string>('auth.audience'),
                 issuer: configService.get<string>('auth.issuer'),
                 subject: configService.get<string>('auth.subject'),
