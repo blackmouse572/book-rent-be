@@ -1,7 +1,9 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestApplication, NestFactory } from '@nestjs/core';
-import { Validator, useContainer } from 'class-validator';
+import { useContainer } from 'class-validator';
+import cookieParser from 'cookie-parser';
+import useCors from 'src/lib/cors';
 import { AppModule } from './app.module';
 import initSwagger from './lib/swagger';
 
@@ -19,35 +21,18 @@ async function bootstrap() {
     //Global
     app.setGlobalPrefix(prefix);
     app.useGlobalPipes(new ValidationPipe());
+    app.use(cookieParser());
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-    //CORS
-    app.enableCors({
-        allowedHeaders: [
-            'Access-Control-Allow-Origin',
-            'Access-Control-Origin',
-            'Access-Control-Allow-Methods',
-            'Content-Type',
-            'Access-Control-Allow-Headers',
-            'Access-Control-Allow-Credentials',
-            'Access-Control-Expose-Headers',
-            'Access-Control-Max-Age',
-            'Access-Control-Request-Headers',
-            'X-Api-Key',
-            'x-api-key',
-        ],
-        credentials: true,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        origin: '*',
-        preflightContinue: false,
-    });
-
+    useCors(app);
     await initSwagger(app);
     await app.listen(port);
 
-    logger.log('************************************');
-    logger.log(`Swagger is running on ${await app.getUrl()}${docPrefix}`);
-    logger.log('************************************\n');
+    if (env !== 'production') {
+        logger.log('************************************');
+        logger.log(`Swagger is running on ${await app.getUrl()}${docPrefix}`);
+        logger.log('************************************\n');
+    }
     logger.log('************************************');
     logger.log(`Server is running on ${await app.getUrl()}/${prefix}`);
     logger.log('************************************\n');

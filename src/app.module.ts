@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import Joi from 'joi';
@@ -9,6 +9,7 @@ import { DatabaseOptionsModule } from 'src/common/database/database.options.modu
 import { DatabaseOptionsService } from 'src/common/database/service/database.options.service';
 import { PaginationModule } from 'src/common/pagination/pagination.module';
 import configs from 'src/configs';
+import { AppLoggerMiddleware } from 'src/lib/logger.middleware';
 import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 import { AuthModule } from './auth/auth.module';
 import { HelpersModule } from './common/helpers/helpers.module';
@@ -107,4 +108,8 @@ import { UserModule } from './user/user.module';
     controllers: [AppController],
     providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(AppLoggerMiddleware).forRoutes('*');
+    }
+}
