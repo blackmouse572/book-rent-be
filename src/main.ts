@@ -18,8 +18,29 @@ async function bootstrap() {
 
     //Global
     app.setGlobalPrefix(prefix);
-    app.useGlobalPipes(new ValidationPipe())
+    app.useGlobalPipes(new ValidationPipe());
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
+    //CORS
+    app.enableCors({
+        allowedHeaders: [
+            'Access-Control-Allow-Origin',
+            'Access-Control-Origin',
+            'Access-Control-Allow-Methods',
+            'Content-Type',
+            'Access-Control-Allow-Headers',
+            'Access-Control-Allow-Credentials',
+            'Access-Control-Expose-Headers',
+            'Access-Control-Max-Age',
+            'Access-Control-Request-Headers',
+            'X-Api-Key',
+            'x-api-key',
+        ],
+        credentials: true,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        origin: '*',
+        preflightContinue: false,
+    });
 
     await initSwagger(app);
     await app.listen(port);
