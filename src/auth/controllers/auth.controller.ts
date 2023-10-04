@@ -11,8 +11,8 @@ import {
     Post,
     Res,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { ENUM_AUTH_LOGIN_WITH } from 'src/auth/constants/auth.enum.constant';
 import {
     AuthJwtAccessProtected,
@@ -201,23 +201,15 @@ export class AuthController {
         const tokenType: string = await this.authService.getTokenType();
         const payloadAccessToken =
             await this.authService.createPayloadAccessToken(payload);
-        const payloadRefreshToken =
-            await this.authService.createPayloadRefreshToken(payload.user_id, {
-                loginWith: ENUM_AUTH_LOGIN_WITH.CREDENTIALS,
-            });
 
         const payloadEncryption = await this.authService.getPayloadEncryption();
 
         let payloadHashedAccessToken: Record<string, any> | string =
             payloadAccessToken;
-        let payloadHashedRefreshToken: Record<string, any> | string =
-            payloadRefreshToken;
 
         if (payloadEncryption) {
             payloadHashedAccessToken =
                 await this.authService.encryptAccessToken(payloadAccessToken);
-            payloadHashedRefreshToken =
-                await this.authService.encryptRefreshToken(payloadRefreshToken);
         }
 
         const accessToken: string = await this.authService.createAccessToken(
