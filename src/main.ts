@@ -1,10 +1,11 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestApplication, NestFactory } from '@nestjs/core';
-import { Validator, useContainer } from 'class-validator';
+import { useContainer } from 'class-validator';
+import cookieParser from 'cookie-parser';
+import useCors from 'src/lib/cors';
 import { AppModule } from './app.module';
 import initSwagger from './lib/swagger';
-import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
     const app: NestApplication = await NestFactory.create(AppModule);
@@ -23,29 +24,7 @@ async function bootstrap() {
     app.use(cookieParser);
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-    //CORS
-    app.enableCors({
-        allowedHeaders: [
-            'Access-Control-Allow-Origin',
-            'Access-Control-Origin',
-            'Access-Control-Allow-Methods',
-            'Content-Type',
-            'Access-Control-Allow-Headers',
-            'Access-Control-Allow-Credentials',
-            'Access-Control-Expose-Headers',
-            'Access-Control-Max-Age',
-            'Access-Control-Request-Headers',
-            'X-Api-Key',
-            'x-api-key',
-            'x-refresh-token',
-            'Authorization',
-        ],
-        credentials: true,
-        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-        origin: '*',
-        preflightContinue: false,
-    });
-
+    useCors(app);
     await initSwagger(app);
     await app.listen(port);
 
