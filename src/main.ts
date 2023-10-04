@@ -21,16 +21,18 @@ async function bootstrap() {
     //Global
     app.setGlobalPrefix(prefix);
     app.useGlobalPipes(new ValidationPipe());
-    app.use(cookieParser);
+    app.use(cookieParser());
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
     useCors(app);
     await initSwagger(app);
     await app.listen(port);
 
-    logger.log('************************************');
-    logger.log(`Swagger is running on ${await app.getUrl()}${docPrefix}`);
-    logger.log('************************************\n');
+    if (env !== 'production') {
+        logger.log('************************************');
+        logger.log(`Swagger is running on ${await app.getUrl()}${docPrefix}`);
+        logger.log('************************************\n');
+    }
     logger.log('************************************');
     logger.log(`Server is running on ${await app.getUrl()}/${prefix}`);
     logger.log('************************************\n');
