@@ -51,7 +51,7 @@ export default async function (app: NestApplication) {
         });
 
         logger.log('************************************');
-        logger.log(`Server is running on /${docPrefix}`);
+        logger.log(`Swagger is running on /${docPrefix}`);
         logger.log('************************************\n');
     }
 }
