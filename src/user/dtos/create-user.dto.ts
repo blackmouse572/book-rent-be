@@ -5,7 +5,6 @@ import {
     IsEmail,
     IsNotEmpty,
     IsOptional,
-    IsPhoneNumber,
     IsString,
     MaxLength,
     MinLength,
@@ -60,7 +59,7 @@ export class UserCreateDto {
     readonly password: string;
 
     @ApiProperty({
-        example: faker.internet.userName,
+        example: faker.internet.userName(),
         required: true,
     })
     @IsString()
