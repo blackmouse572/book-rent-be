@@ -1,12 +1,13 @@
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestApplication } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 
-export default async function initSwagger(app: NestApplication) {
+export default async function (app: NestApplication) {
     const configService = app.get(ConfigService);
     const env: string = configService.get<string>('app.env');
-
+    const logger = new Logger();
     const docTitle: string = configService.get<string>('doc.name');
     const docDescription: string = configService.get<string>('doc.description');
     const docVersion: string = configService.get<string>('doc.version');
@@ -42,11 +43,15 @@ export default async function initSwagger(app: NestApplication) {
             jsonDocumentUrl: `${docPrefix}/json`,
             customSiteTitle: docTitle,
             explorer: false,
-            swaggerOptions: {
-                docExpansion: 'none',
-                filter: true,
-                showRequestDuration: true,
-            },
+            // swaggerOptions: {
+            //     docExpansion: 'none',
+            //     filter: true,
+            //     showRequestDuration: true,
+            // },
         });
+
+        logger.log('************************************');
+        logger.log(`Server is running on /${docPrefix}`);
+        logger.log('************************************\n');
     }
 }

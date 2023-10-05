@@ -204,7 +204,7 @@ export class AuthController {
         @Res({ passthrough: true }) res: Response
     ) {
         const payload = {
-            user_id: user.id,
+            _id: user.id,
             user_phone: user.phone,
             type: user.role,
         };
