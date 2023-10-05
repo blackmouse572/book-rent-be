@@ -17,7 +17,7 @@ export default function useCors(app: NestApplication) {
         'Authorization',
     ];
     const allowedMethods = 'GET,HEAD,PUT,PATCH,POST,DELETE';
-    const origins = ['*'];
+    const origins = ['http://localhost:5173', 'http://localhost:3000'];
 
     app.enableCors({
         allowedHeaders,

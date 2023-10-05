@@ -20,11 +20,10 @@ export const AuthJwtPayload = createParamDecorator(
 
 export const AuthJwtToken = createParamDecorator(
     (data: string, ctx: ExecutionContext): string => {
-        const { headers } = ctx.switchToHttp().getRequest();
-        const { authorization } = headers;
-        const authorizations: string[] = authorization.split(' ');
+        const { cookies } = ctx.switchToHttp().getRequest();
+        const token = cookies['x-refresh-token'];
 
-        return authorizations.length >= 2 ? authorizations[1] : undefined;
+        return token;
     }
 );
 
