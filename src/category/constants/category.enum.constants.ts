@@ -1,0 +1,4 @@
+export enum CATEGORY_STATUS_ENUM {
+    ENABLE = 'ENABLE',
+    DISABLE = 'DISABLE',
+}
