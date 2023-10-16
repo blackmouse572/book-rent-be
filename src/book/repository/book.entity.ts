@@ -1,20 +1,14 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import {
+import mongoose, {
     CallbackWithoutResultAndOptionalError,
     HydratedDocument,
 } from 'mongoose';
 import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
-import {
-    CategoryEntity,
-    CategorySchema,
-} from 'src/category/repository/category.entity';
+import { CategoryEntity } from 'src/category/repository/category.entity';
 import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
-import { GenreEntity, GenreSchema } from 'src/genre/repository/genre.entity';
-import {
-    ReviewEntity,
-    ReviewSchema,
-} from 'src/review/repository/review.entity';
+import { GenreEntity } from 'src/genre/repository/genre.entity';
+import { ReviewEntity } from 'src/review/repository/review.entity';
 
 export const BookDatabaseName = 'books';
 
@@ -37,8 +31,7 @@ export class BookEntity extends DatabaseMongoObjectIdEntityAbstract {
     rental_price: number;
 
     @Prop({
-        type: [CategorySchema],
-        default: [],
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'categories' }],
     })
     category: CategoryEntity[];
 
@@ -75,8 +68,7 @@ export class BookEntity extends DatabaseMongoObjectIdEntityAbstract {
     deposit: number;
 
     @Prop({
-        default: [],
-        type: [ReviewSchema],
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'reviews' }],
     })
     reviews: ReviewEntity[];
 
@@ -91,8 +83,7 @@ export class BookEntity extends DatabaseMongoObjectIdEntityAbstract {
     keyword: string;
 
     @Prop({
-        type: [GenreSchema],
-        default: [],
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'genres' }],
     })
     genres: GenreEntity[];
 

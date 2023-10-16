@@ -1,275 +1,131 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { IAuthPassword } from 'src/auth/interfaces/auth.interface';
+import { ConflictException, Injectable } from '@nestjs/common';
+import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
+import { BookCreateDto } from 'src/book/dtos/create-book.dto';
+import { IBookService } from 'src/book/interfaces/book.service.interfaces';
+import { BookDoc, BookEntity } from 'src/book/repository/book.entity';
+import { BookRepository } from 'src/book/repository/book.repository';
+import { CategoryDoc } from 'src/category/repository/category.entity';
+import { CategoryService } from 'src/category/services/category.service';
 import {
     IDatabaseCreateOptions,
-    IDatabaseExistOptions,
     IDatabaseFindAllOptions,
     IDatabaseFindOneOptions,
     IDatabaseGetTotalOptions,
     IDatabaseManyOptions,
     IDatabaseSaveOptions,
 } from 'src/common/database/interfaces/database.interface';
-import { HelperDateService } from 'src/common/helpers/services/helper.date.service';
-import { UserCreateDto } from 'src/user/dtos/create-user.dto';
-import { UserUpdateDto } from 'src/user/dtos/update-user.dto';
-import { IUserEntity } from 'src/user/interfaces/user.interface';
-import { IUserService } from 'src/user/interfaces/user.service.interfaces';
-import { UserDoc, UserEntity } from 'src/user/repository/user.entity';
-import { UserRepository } from 'src/user/repository/user.repository';
+import { GenreDoc } from 'src/genre/repository/genre.entity';
+import { GenreService } from 'src/genre/services/genre.service';
 
 @Injectable()
-export class BookService implements IUserService {
-    private readonly authMaxPasswordAttempt: number;
-
+export class BookService implements IBookService {
     constructor(
-        private readonly userRepository: UserRepository,
-        private readonly helperDateService: HelperDateService,
-        private readonly configService: ConfigService
-    ) {
-        this.authMaxPasswordAttempt = this.configService.get<number>(
-            'auth.password.maxAttempt'
-        );
-    }
+        private readonly bookRepository: BookRepository,
+        private readonly genreService: GenreService,
+        private readonly categoryService: CategoryService
+    ) {}
 
     async findAll(
         find?: Record<string, any>,
         options?: IDatabaseFindAllOptions
-    ): Promise<IUserEntity[]> {
-        return this.userRepository.findAll<IUserEntity>(find, {
+    ): Promise<BookEntity[]> {
+        return this.bookRepository.findAll<BookEntity>(find, {
             ...options,
             join: true,
         });
     }
 
-    async findOneById<T>(
+    async findOneById(
         _id: string,
         options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOneById<T>(_id, options);
+    ): Promise<BookDoc> {
+        return this.bookRepository.findOneById<BookDoc>(_id, options);
     }
 
-    async findOne<T>(
+    async findOne(
         find: Record<string, any>,
         options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOne<T>(find, options);
+    ): Promise<BookDoc> {
+        return this.bookRepository.findOne<BookDoc>(find, options);
     }
-
-    async findOneByUsername<T>(
-        username: string,
-        options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOne<T>({ username }, options);
+    findOneByKeyword(
+        keyword: string,
+        options?: IDatabaseFindOneOptions<any>
+    ): Promise<BookDoc> {
+        return this.bookRepository.findOne({ keyword }, options);
     }
-
-    async findOneByEmail<T>(
-        email: string,
-        options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOne<T>({ email }, options);
-    }
-
-    async findOneByPhoneNumber<T>(
-        phone: string,
-        options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOne<T>({ phone }, options);
-    }
-
-    async getTotal(
+    getTotal(
         find?: Record<string, any>,
         options?: IDatabaseGetTotalOptions
     ): Promise<number> {
-        return this.userRepository.getTotal(find, { ...options, join: true });
+        return this.bookRepository.getTotal(find, { ...options, join: true });
     }
-
     async create(
-        { email, fullName, phone, username }: UserCreateDto,
-        { passwordHash, salt }: IAuthPassword,
-        options?: IDatabaseCreateOptions
-    ): Promise<UserDoc> {
-        const create: UserEntity = new UserEntity();
-        create.email = email;
-        create.username = username;
-        create.password = passwordHash;
-        create.fullName = fullName;
-        create.phone = phone;
-        create.isActive = true;
-        create.inactivePermanent = false;
-        create.blocked = false;
-        create.salt = salt;
-        create.passwordAttempt = 0;
+        dto: BookCreateDto,
+        options?: IDatabaseCreateOptions<any>
+    ): Promise<BookDoc> {
+        //check genres
+        const genres: GenreDoc[] = [];
 
-        return this.userRepository.create<UserEntity>(create, options);
+        dto.genres.map(async (g) => {
+            const a = await this.genreService.findOneById(g);
+            if (!a)
+                throw new ConflictException({
+                    message: 'can not find genre with id: ' + g,
+                });
+            genres.push(a);
+        });
+        //check category
+        const categorys: CategoryDoc[] = [];
+        dto.category.map(async (c) => {
+            const category = await this.categoryService.findOneById(c);
+            if (!category)
+                throw new ConflictException({
+                    message: 'can not find category with id: ' + c,
+                });
+            categorys.push(category);
+        });
+
+        const entity = new BookEntity();
+        entity.author = dto.author;
+        entity.category = categorys;
+        entity.genres = genres;
+        entity.deposit = dto.deposit;
+        entity.description = dto.description;
+        entity.image = dto.image;
+        entity.keyword = dto.keyword;
+        entity.name = dto.name;
+        entity.rental_price = dto.rental_price;
+        entity.status = BOOK_STATUS_ENUM.ENABLE;
+
+        return this.bookRepository.create(entity, options);
     }
 
-    async existByEmail(
-        email: string,
-        options?: IDatabaseExistOptions
-    ): Promise<boolean> {
-        return this.userRepository.exists(
-            {
-                email: {
-                    $regex: new RegExp(`\\b${email}\\b`),
-                    $options: 'i',
-                },
-            },
-            { ...options, withDeleted: true }
-        );
-    }
-
-    async existByPhoneNumber(
-        phone: string,
-        options?: IDatabaseExistOptions
-    ): Promise<boolean> {
-        return this.userRepository.exists(
-            {
-                phone,
-            },
-            { ...options, withDeleted: true }
-        );
-    }
-
-    async existByUsername(
-        username: string,
-        options?: IDatabaseExistOptions
-    ): Promise<boolean> {
-        return this.userRepository.exists(
-            { username },
-            { ...options, withDeleted: true }
-        );
-    }
-
-    async delete(
-        repository: UserDoc,
+    delete(
+        repository: BookDoc,
         options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        return this.userRepository.softDelete(repository, options);
+    ): Promise<BookDoc> {
+        return this.bookRepository.softDelete(repository, options);
     }
-
-    async updateName(
-        repository: UserDoc,
-        { fullName }: UserUpdateDto,
+    active(
+        repository: BookDoc,
         options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.fullName = fullName;
-
-        return this.userRepository.save(repository, options);
+    ): Promise<BookDoc> {
+        repository.status = BOOK_STATUS_ENUM.ENABLE;
+        return this.bookRepository.save(repository, options);
     }
-
-    async updateAddress(
-        repository: UserDoc,
-        { address }: UserUpdateDto,
+    inactive(
+        repository: BookDoc,
         options?: IDatabaseSaveOptions
-    ) {
-        repository.address = address;
-        return this.userRepository.save(repository, options);
+    ): Promise<BookDoc> {
+        repository.status = BOOK_STATUS_ENUM.DISABLE;
+        return this.bookRepository.save(repository, options);
     }
 
-    async updatePhoto(
-        repository: UserDoc,
-        photo: string,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.avatar = photo;
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async updatePassword(
-        repository: UserDoc,
-        { passwordHash, salt }: IAuthPassword,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.password = passwordHash;
-        repository.salt = salt;
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async active(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserEntity> {
-        repository.isActive = true;
-        repository.inactiveDate = undefined;
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async inactive(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.isActive = false;
-        repository.inactiveDate = this.helperDateService.create();
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async inactivePermanent(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.isActive = false;
-        repository.inactivePermanent = true;
-        repository.inactiveDate = this.helperDateService.create();
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async blocked(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.blocked = true;
-        repository.blockedDate = this.helperDateService.create();
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async unblocked(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.blocked = false;
-        repository.blockedDate = undefined;
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async maxPasswordAttempt(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.passwordAttempt = this.authMaxPasswordAttempt;
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async increasePasswordAttempt(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.passwordAttempt = ++repository.passwordAttempt;
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async resetPasswordAttempt(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.passwordAttempt = 0;
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async deleteMany(
+    deleteMany(
         find: Record<string, any>,
         options?: IDatabaseManyOptions
     ): Promise<boolean> {
-        return this.userRepository.deleteMany(find, options);
+        return this.bookRepository.deleteMany(find, options);
     }
 }

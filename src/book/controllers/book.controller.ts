@@ -1,104 +1,61 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthJwtAdminAccessProtected } from 'src/auth/decorators/auth.jwt.decorator';
 import {
-    PaginationQuery,
-    PaginationQueryFilterInBoolean,
-    PaginationQueryFilterInEnum,
-} from 'src/common/pagination/decorators/pagination.decorator';
-import { PaginationListDto } from 'src/common/pagination/dto/pagination.list.dto';
-import { PaginationService } from 'src/common/pagination/services/pagination.service';
-import { RequestParamGuard } from 'src/lib/guards/request.decorator';
-import { ENUM_ROLE_TYPE } from 'src/user/constants/user.enum.constants';
-import {
-    USER_DEFAULT_AVAILABLE_ORDER_BY,
-    USER_DEFAULT_AVAILABLE_SEARCH,
-    USER_DEFAULT_BLOCKED,
-    USER_DEFAULT_INACTIVE_PERMANENT,
-    USER_DEFAULT_IS_ACTIVE,
-    USER_DEFAULT_ORDER_BY,
-    USER_DEFAULT_ORDER_DIRECTION,
-    USER_DEFAULT_PER_PAGE,
-    USER_DEFAULT_ROLE,
-} from 'src/user/constants/user.list-constants';
-import { UserAdminGetGuard } from 'src/user/decorators/user.admin.decorator';
-import { GetUser } from 'src/user/decorators/user.decorator';
-import { UserRequestDto } from 'src/user/dtos/get-user.dto';
-import { IUserEntity } from 'src/user/interfaces/user.interface';
-import { UserDoc } from 'src/user/repository/user.entity';
-import { UserService } from 'src/user/services/user.service';
-@ApiTags('modules.admin.user')
-@Controller({
-    path: '/user',
-})
-export class UserManageController {
-    constructor(
-        private readonly paginationService: PaginationService,
-        private readonly userService: UserService
-    ) {}
+    Body,
+    Controller,
+    Delete,
+    Get,
+    NotFoundException,
+    Param,
+    Post,
+} from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
+import { BookCreateDto } from 'src/book/dtos/create-book.dto';
+import { BookDoc, BookEntity } from 'src/book/repository/book.entity';
+import { BookService } from 'src/book/services/book.service';
 
-    //TODO: IMPLEMENT POLICY HERE
+@Controller('book')
+export class BookController {
+    constructor(private readonly bookService: BookService) {}
+
     @ApiOperation({
-        tags: ['admin', 'user'],
-        description: 'Get list of users in database',
-        summary: 'List user',
+        tags: ['book'],
+        description: 'create book',
     })
-    @AuthJwtAdminAccessProtected()
-    @Get('/list')
-    async list(
-        @PaginationQuery(
-            USER_DEFAULT_PER_PAGE,
-            USER_DEFAULT_ORDER_BY,
-            USER_DEFAULT_ORDER_DIRECTION,
-            USER_DEFAULT_AVAILABLE_SEARCH,
-            USER_DEFAULT_AVAILABLE_ORDER_BY
-        )
-        { _search, _limit, _offset, _order }: PaginationListDto,
-        @PaginationQueryFilterInBoolean('isActive', USER_DEFAULT_IS_ACTIVE)
-        isActive: Record<string, any>,
-        @PaginationQueryFilterInBoolean('blocked', USER_DEFAULT_BLOCKED)
-        blocked: Record<string, any>,
-        @PaginationQueryFilterInBoolean(
-            'inactivePermanent',
-            USER_DEFAULT_INACTIVE_PERMANENT
-        )
-        inactivePermanent: Record<string, any>,
-        @PaginationQueryFilterInEnum('role', USER_DEFAULT_ROLE, ENUM_ROLE_TYPE)
-        role: Record<string, any>
-    ) {
-        const find: Record<string, any> = {
-            ..._search,
-            ...isActive,
-            ...blocked,
-            ...inactivePermanent,
-            ...role,
-        };
-
-        const users: IUserEntity[] = await this.userService.findAll(find, {
-            paging: {
-                limit: _limit,
-                offset: _offset,
-            },
-            order: _order,
-        });
-
-        const total: number = await this.userService.getTotal(find);
-        const totalPage: number = this.paginationService.totalPage(
-            total,
-            _limit
-        );
-
-        return {
-            _pagination: { total, totalPage },
-            data: users,
-        };
+    @Post()
+    async create(@Body() createBookDto: BookCreateDto): Promise<BookDoc> {
+        return this.bookService.create(createBookDto);
+    }
+    @ApiOperation({
+        tags: ['book'],
+        description: 'get book by id',
+    })
+    @Get('/:id')
+    async getById(@Param('id') _id: string): Promise<BookDoc> {
+        const result = await this.bookService.findOneById(_id);
+        if (!result) {
+            throw new NotFoundException({ message: 'book not found' });
+        }
+        return result;
     }
 
-    @UserAdminGetGuard()
-    @RequestParamGuard(UserRequestDto)
-    @AuthJwtAdminAccessProtected()
-    @Get('/get/:user')
-    async get(@GetUser() user: UserDoc): Promise<any> {
-        return { data: user.toObject() };
+    @ApiOperation({
+        tags: ['book'],
+        description: 'get all book',
+    })
+    @Get()
+    findAll(): Promise<BookEntity[]> {
+        return this.bookService.findAll();
+    }
+
+    @ApiOperation({
+        tags: ['book'],
+        description: 'delete book by Id',
+    })
+    @Delete('/:id')
+    async delete(@Param('id') _id: string): Promise<BookDoc> {
+        const book: BookDoc = await this.bookService.findOneById(_id);
+        if (!book) {
+            throw new NotFoundException({ message: 'book not found' });
+        }
+        return this.bookService.delete(book);
     }
 }
