@@ -1,30 +1,33 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { BookController } from 'src/book/controllers/book.controller';
+import { BookEntity, BookSchema } from 'src/book/repository/book.entity';
+import { BookRepository } from 'src/book/repository/book.repository';
+import { BookService } from 'src/book/services/book.service';
+import { CategoryModule } from 'src/category/category.module';
 import { DATABASE_CONNECTION_NAME } from 'src/common/database/constants/database.constraint';
 import { HelpersModule } from 'src/common/helpers/helpers.module';
-import { UserEntity, UserSchema } from 'src/user/repository/user.entity';
-import { UserRepository } from 'src/user/repository/user.repository';
-import { UserService } from 'src/user/services/user.service';
-import { UserController } from 'src/user/controllers/user.controller';
-import { UserManageController } from 'src/user/controllers/user.manage.controller';
 import { PaginationModule } from 'src/common/pagination/pagination.module';
+import { GenreModule } from 'src/genre/genre.module';
 
 @Module({
-    controllers: [UserController, UserManageController],
-    providers: [UserService, UserRepository],
-    exports: [UserService],
+    controllers: [BookController],
+    providers: [BookService, BookRepository],
+    exports: [BookService],
     imports: [
         PaginationModule,
         HelpersModule,
         MongooseModule.forFeature(
             [
                 {
-                    name: UserEntity.name,
-                    schema: UserSchema,
+                    name: BookEntity.name,
+                    schema: BookSchema,
                 },
             ],
             DATABASE_CONNECTION_NAME
         ),
+        GenreModule,
+        CategoryModule,
     ],
 })
-export class UserModule {}
+export class BookModule {}
