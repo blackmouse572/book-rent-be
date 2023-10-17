@@ -1,4 +1,5 @@
 import { BookCreateDto } from 'src/book/dtos/create-book.dto';
+import { BookUpdateDto } from 'src/book/dtos/update-book.dto';
 import { BookDoc, BookEntity } from 'src/book/repository/book.entity';
 import {
     IDatabaseCreateOptions,
@@ -34,10 +35,7 @@ export interface IBookService {
         dto: BookCreateDto,
         options?: IDatabaseCreateOptions
     ): Promise<BookDoc>;
-    delete(
-        repository: BookDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<BookDoc>;
+    delete(id: string, options?: IDatabaseSaveOptions): Promise<BookDoc>;
     active(
         repository: BookDoc,
         options?: IDatabaseSaveOptions
@@ -50,4 +48,9 @@ export interface IBookService {
         find: Record<string, any>,
         options?: IDatabaseManyOptions
     ): Promise<boolean>;
+    update(
+        id: string,
+        bookDto: BookUpdateDto,
+        options?: IDatabaseManyOptions
+    ): Promise<BookDoc>;
 }

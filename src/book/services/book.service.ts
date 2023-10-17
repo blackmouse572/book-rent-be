@@ -1,6 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
 import { BookCreateDto } from 'src/book/dtos/create-book.dto';
+import { BookUpdateDto } from 'src/book/dtos/update-book.dto';
 import { IBookService } from 'src/book/interfaces/book.service.interfaces';
 import { BookDoc, BookEntity } from 'src/book/repository/book.entity';
 import { BookRepository } from 'src/book/repository/book.repository';
@@ -24,6 +29,19 @@ export class BookService implements IBookService {
         private readonly genreService: GenreService,
         private readonly categoryService: CategoryService
     ) {}
+    async update(
+        id: string,
+        bookDto: BookUpdateDto,
+        options?: IDatabaseManyOptions<any>
+    ): Promise<BookDoc> {
+        const post = await this.findOneById(id);
+        if (!post) {
+            throw new NotFoundException();
+        }
+        await this.bookRepository.updateMany(post, bookDto, options);
+
+        return await this.findOneById(id);
+    }
 
     async findAll(
         find?: Record<string, any>,
@@ -101,11 +119,12 @@ export class BookService implements IBookService {
         return this.bookRepository.create(entity, options);
     }
 
-    delete(
-        repository: BookDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<BookDoc> {
-        return this.bookRepository.softDelete(repository, options);
+    async delete(id: string, options?: IDatabaseSaveOptions): Promise<BookDoc> {
+        const book: BookDoc = await this.findOneById(id);
+        if (!book) {
+            throw new NotFoundException({ message: 'book not found' });
+        }
+        return this.bookRepository.softDelete(book, options);
     }
     active(
         repository: BookDoc,
