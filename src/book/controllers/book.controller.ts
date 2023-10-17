@@ -6,9 +6,11 @@ import {
     NotFoundException,
     Param,
     Post,
+    Put,
 } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { BookCreateDto } from 'src/book/dtos/create-book.dto';
+import { BookUpdateDto } from 'src/book/dtos/update-book.dto';
 import { BookDoc, BookEntity } from 'src/book/repository/book.entity';
 import { BookService } from 'src/book/services/book.service';
 
@@ -52,10 +54,17 @@ export class BookController {
     })
     @Delete('/:id')
     async delete(@Param('id') _id: string): Promise<BookDoc> {
-        const book: BookDoc = await this.bookService.findOneById(_id);
-        if (!book) {
-            throw new NotFoundException({ message: 'book not found' });
-        }
-        return this.bookService.delete(book);
+        return this.bookService.delete(_id);
+    }
+    @ApiOperation({
+        tags: ['book'],
+        description: 'update book by Id',
+    })
+    @Put('/:id')
+    async update(
+        @Param('id') id: string,
+        @Body() bookUpdateDto: BookUpdateDto
+    ) {
+        return this.bookService.update(id, bookUpdateDto);
     }
 }
