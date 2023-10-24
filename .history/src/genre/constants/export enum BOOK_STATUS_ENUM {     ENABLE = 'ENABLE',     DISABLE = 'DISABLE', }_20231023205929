@@ -1,0 +1,4 @@
+export enum GENRE_STATUS_ENUM {
+    ENABLED = 'ENABLED',
+    DISABLED = 'DISABLED',
+}
