@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import Joi from 'joi';
 import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
+import { BookModule } from 'src/book/book.module';
 import { DATABASE_CONNECTION_NAME } from 'src/common/database/constants/database.constraint';
 import { DatabaseOptionsModule } from 'src/common/database/database.options.module';
 import { DatabaseOptionsService } from 'src/common/database/service/database.options.service';
@@ -87,6 +88,9 @@ import { UserModule } from './user/user.module';
                     .min(16)
                     .max(50)
                     .optional(),
+                CLOUDINARY_NAME: Joi.string().required(),
+                CLOUDINARY_API_KEY: Joi.string().required(),
+                CLOUDINARY_API_SECRET: Joi.string().required(),
             }),
             validationOptions: {
                 allowUnknown: true,
@@ -104,6 +108,7 @@ import { UserModule } from './user/user.module';
         AuthModule.forRoot(),
         PaginationModule,
         UserModule,
+        BookModule,
     ],
     controllers: [AppController],
     providers: [AppService],
