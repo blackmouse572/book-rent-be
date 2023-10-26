@@ -88,6 +88,9 @@ import { UserModule } from './user/user.module';
                     .min(16)
                     .max(50)
                     .optional(),
+                CLOUDINARY_NAME: Joi.string().required(),
+                CLOUDINARY_API_KEY: Joi.string().required(),
+                CLOUDINARY_API_SECRET: Joi.string().required(),
             }),
             validationOptions: {
                 allowUnknown: true,
