@@ -1,16 +1,10 @@
-import {
-    ConflictException,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
-import { BookCreateDto } from 'src/book/dtos/create-book.dto';
 import { BookUpdateDto } from 'src/book/dtos/update-book.dto';
-import { IBookService } from 'src/book/interfaces/book.service.interfaces';
 import { BookDoc, BookEntity } from 'src/book/repository/book.entity';
 import { BookRepository } from 'src/book/repository/book.repository';
-import { CategoryDoc } from 'src/category/repository/category.entity';
 import { CategoryService } from 'src/category/services/category.service';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import {
     IDatabaseCreateOptions,
     IDatabaseFindAllOptions,
@@ -19,15 +13,15 @@ import {
     IDatabaseManyOptions,
     IDatabaseSaveOptions,
 } from 'src/common/database/interfaces/database.interface';
-import { GenreDoc } from 'src/genre/repository/genre.entity';
 import { GenreService } from 'src/genre/services/genre.service';
 
 @Injectable()
-export class BookService implements IBookService {
+export class BookService {
     constructor(
         private readonly bookRepository: BookRepository,
         private readonly genreService: GenreService,
-        private readonly categoryService: CategoryService
+        private readonly categoryService: CategoryService,
+        private readonly cloudinaryService: CloudinaryService
     ) {}
     async update(
         id: string,
@@ -79,44 +73,10 @@ export class BookService implements IBookService {
         return this.bookRepository.getTotal(find, { ...options, join: true });
     }
     async create(
-        dto: BookCreateDto,
+        entity: BookEntity,
         options?: IDatabaseCreateOptions<any>
     ): Promise<BookDoc> {
-        //check genres
-        const genres: GenreDoc[] = [];
-
-        dto.genres.map(async (g) => {
-            const a = await this.genreService.findOneById(g);
-            if (!a)
-                throw new ConflictException({
-                    message: 'can not find genre with id: ' + g,
-                });
-            genres.push(a);
-        });
-        //check category
-        const categorys: CategoryDoc[] = [];
-        dto.category.map(async (c) => {
-            const category = await this.categoryService.findOneById(c);
-            if (!category)
-                throw new ConflictException({
-                    message: 'can not find category with id: ' + c,
-                });
-            categorys.push(category);
-        });
-
-        const entity = new BookEntity();
-        entity.author = dto.author;
-        entity.category = categorys;
-        entity.genres = genres;
-        entity.deposit = dto.deposit;
-        entity.description = dto.description;
-        entity.image = dto.image;
-        entity.keyword = dto.keyword;
-        entity.name = dto.name;
-        entity.rental_price = dto.rental_price;
-        entity.status = BOOK_STATUS_ENUM.ENABLE;
-
-        return this.bookRepository.create(entity, options);
+        return await this.bookRepository.create(entity, options);
     }
 
     async delete(id: string, options?: IDatabaseSaveOptions): Promise<BookDoc> {

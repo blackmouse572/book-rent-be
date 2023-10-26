@@ -1,6 +1,5 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
     ArrayNotEmpty,
     IsArray,
@@ -9,8 +8,8 @@ import {
     IsString,
     MaxLength,
     Min,
-    ValidateNested,
 } from 'class-validator';
+import { GenreCreateDto } from 'src/genre/dtos/create-genre.dto';
 
 export class BookCreateDto {
     @ApiProperty({
@@ -25,6 +24,7 @@ export class BookCreateDto {
     @ApiProperty({
         example: faker.commerce.price(),
         required: true,
+        type: 'integer',
     })
     @IsNotEmpty()
     @IsNumber()
@@ -32,16 +32,17 @@ export class BookCreateDto {
     readonly rental_price: number;
 
     @ApiProperty({
-        example: faker.helpers.multiple(() => faker.string.uuid(), {
-            count: 3,
-        }),
+        example: faker.helpers.multiple(
+            () => faker.database.mongodbObjectId(),
+            {
+                count: 3,
+            }
+        ),
         required: true,
         description: 'Category Id',
     })
     @IsArray()
     @ArrayNotEmpty()
-    @ValidateNested({ each: true })
-    @Type(() => String)
     readonly category: string[];
 
     @ApiProperty({
@@ -50,17 +51,7 @@ export class BookCreateDto {
     })
     @IsNotEmpty()
     @IsString()
-    @Type(() => String)
     readonly description: string;
-
-    @ApiProperty({
-        example: faker.image.url(),
-        required: true,
-    })
-    @IsNotEmpty()
-    @IsString()
-    @MaxLength(225)
-    readonly image: string;
 
     @ApiProperty({
         example: faker.commerce.price(),
@@ -81,17 +72,13 @@ export class BookCreateDto {
     readonly keyword: string;
 
     @ApiProperty({
-        example: faker.helpers.multiple(() => faker.string.uuid(), {
-            count: 3,
-        }),
         required: true,
-        description: 'Genres Id',
+        description: 'Genres datas',
+        type: [GenreCreateDto],
     })
     @IsArray()
     @ArrayNotEmpty()
-    @ValidateNested({ each: true })
-    @Type(() => String)
-    readonly genres: string[];
+    readonly genres: GenreCreateDto[];
 
     @ApiProperty({
         example: faker.person.fullName(),
@@ -101,4 +88,11 @@ export class BookCreateDto {
     @IsString()
     @MaxLength(50)
     readonly author: string;
+
+    @ApiProperty({
+        type: 'string',
+        format: 'binary',
+        required: true,
+    })
+    readonly image: Express.Multer.File;
 }
