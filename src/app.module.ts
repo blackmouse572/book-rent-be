@@ -15,7 +15,7 @@ import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 import { AuthModule } from './auth/auth.module';
 import { HelpersModule } from './common/helpers/helpers.module';
 import { UserModule } from './user/user.module';
-
+import { CategoryModule } from './category/category.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -109,12 +109,13 @@ import { UserModule } from './user/user.module';
         PaginationModule,
         UserModule,
         BookModule,
+        CategoryModule, // Integration of the CategoryModule
     ],
     controllers: [AppController],
     providers: [AppService],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AppLoggerMiddleware).forRoutes('*');
+        consumer.apply(AppLoggerMiddleware).forRoutes('*'); // This middleware applies to all routes
     }
 }
