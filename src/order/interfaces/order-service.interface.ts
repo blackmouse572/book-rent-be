@@ -35,7 +35,7 @@ export interface IOrderService {
             rentalDate,
             returnDate,
             returnLocation,
-            despositType,
+            depositType,
         }: PlaceOrderDto,
         userId: string,
         totalPrice: number,

@@ -52,7 +52,7 @@ export class OrderService implements IOrderService {
             rentalDate,
             returnDate,
             returnLocation,
-            despositType,
+            depositType,
             bookId,
         }: PlaceOrderDto,
         userId: string,
@@ -62,8 +62,8 @@ export class OrderService implements IOrderService {
         return this.orderRepository.create<CreateOrderDTO>(
             {
                 bookId,
-                despositType,
                 pickupLocation,
+                depositType,
                 quantity,
                 rentalDate,
                 returnDate,

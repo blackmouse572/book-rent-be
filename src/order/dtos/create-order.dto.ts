@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
 import {
     IsDateString,
+    IsEnum,
     IsMongoId,
     IsNotEmpty,
     IsNumber,
@@ -72,8 +73,8 @@ export class PlaceOrderDto {
         required: true,
     })
     @IsNotEmpty()
-    @IsString()
-    despositType: ENUM_DEPOSIT_TYPE;
+    @IsEnum(ENUM_DEPOSIT_TYPE)
+    depositType: ENUM_DEPOSIT_TYPE;
 }
 
 export class CreateOrderDTO extends PlaceOrderDto {

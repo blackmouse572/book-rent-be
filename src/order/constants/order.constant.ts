@@ -9,18 +9,17 @@ export const ORDER_DEFAULT_ORDER_BY = 'createdAt';
 export const ORDER_DEFAULT_ORDER_DIRECTION =
     ENUM_PAGINATION_ORDER_DIRECTION_TYPE.ASC;
 export const ORDER_DEFAULT_AVAILABLE_ORDER_BY = [
-    'username',
-    'firstName',
-    'lastName',
-    'email',
-    'mobileNumber',
     'createdAt',
+    'updatedAt',
+    'rentalDate',
+    'returnDate',
+    'status',
+    'depositType',
 ];
 export const ORDER_DEFAULT_AVAILABLE_SEARCH = [
-    'book_id',
-    'pickup_location',
-    'return_location',
+    'pickupLocation',
+    'returnLocation',
 ];
 
 export const ORDER_DEFAULT_STATUS = Object.values(ENUM_ORDER_STATUS);
-export const ORDER_DEFAULT_ROLE = Object.values(ENUM_DEPOSIT_TYPE);
+export const ORDER_DEFAULT_DEPOSIT_TYPE = Object.values(ENUM_DEPOSIT_TYPE);
