@@ -15,6 +15,8 @@ import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 import { AuthModule } from './auth/auth.module';
 import { HelpersModule } from './common/helpers/helpers.module';
 import { UserModule } from './user/user.module';
+import { OrderModule } from './order/order.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
     imports: [
@@ -109,6 +111,8 @@ import { UserModule } from './user/user.module';
         PaginationModule,
         UserModule,
         BookModule,
+        OrderModule,
+        TransactionModule,
     ],
     controllers: [AppController],
     providers: [AppService],

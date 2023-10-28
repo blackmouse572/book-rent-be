@@ -1,0 +1,11 @@
+export enum ENUM_ORDER_STATUS {
+    SHIPPING = 'SHIPPING',
+    RETURNED = 'RETURNED',
+    CANCELLED = 'CANCELLED',
+    PENDING = 'PENDING',
+}
+
+export enum ENUM_DEPOSIT_TYPE {
+    COD = 'COD',
+    ONLINE = 'ONLINE',
+}

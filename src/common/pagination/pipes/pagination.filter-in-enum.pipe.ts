@@ -27,6 +27,10 @@ export function PaginationFilterInEnumPipe<T>(
                     .split(',')
                     .map((val: string) => defaultEnum[val])
                     .filter((val: string) => val) as T[];
+                console.log({
+                    value: value,
+                    finalValue: finalValue,
+                });
             }
 
             if (raw) {

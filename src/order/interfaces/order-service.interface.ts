@@ -1,0 +1,41 @@
+import {
+    IDatabaseCreateOptions,
+    IDatabaseFindAllOptions,
+    IDatabaseFindOneOptions,
+    IDatabaseGetTotalOptions,
+} from 'src/common/database/interfaces/database.interface';
+import { PlaceOrderDto } from 'src/order/dtos/create-order.dto';
+import {
+    OrderDocument,
+    OrderEntity,
+} from 'src/order/repositories/order.entity';
+
+export interface IOrderService {
+    findAll(
+        find?: Record<string, any>,
+        options?: IDatabaseFindAllOptions
+    ): Promise<OrderEntity[]>;
+    findOneById<T>(_id: string, options?: IDatabaseFindOneOptions): Promise<T>;
+    findOne<T>(
+        find: Record<string, any>,
+        options?: IDatabaseFindOneOptions
+    ): Promise<T>;
+    getTotal(
+        find?: Record<string, any>,
+        options?: IDatabaseGetTotalOptions
+    ): Promise<number>;
+    create(
+        {
+            bookId,
+            pickupLocation,
+            quantity,
+            rentalDate,
+            returnDate,
+            returnLocation,
+            despositType,
+        }: PlaceOrderDto,
+        userId: string,
+        totalPrice: number,
+        options?: IDatabaseCreateOptions
+    ): Promise<OrderDocument>;
+}

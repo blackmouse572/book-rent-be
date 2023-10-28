@@ -9,7 +9,7 @@ import { PaginationService } from 'src/common/pagination/services/pagination.ser
 
 export function PaginationFilterDatePipe(
     field: string,
-    raw: boolean,
+    raw?: boolean,
     options?: IPaginationFilterDateOptions
 ): Type<PipeTransform> {
     @Injectable({ scope: Scope.REQUEST })
