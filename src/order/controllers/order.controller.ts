@@ -11,8 +11,8 @@ import { Types } from 'mongoose';
 import {
     AuthJwtAccessProtected,
     AuthJwtPayload,
+    AuthUserId,
 } from 'src/auth/decorators/auth.jwt.decorator';
-import { BookEntity } from 'src/book/repository/book.entity';
 import { BookService } from 'src/book/services/book.service';
 import {
     PaginationQuery,
@@ -30,6 +30,7 @@ import {
 } from 'src/order/constants/order.constant';
 import { PlaceOrderDto } from 'src/order/dtos/create-order.dto';
 import { OrderRequestDto } from 'src/order/dtos/request-order.dto';
+import { OrderDocument } from 'src/order/repositories/order.entity';
 import { OrderService } from 'src/order/services/order.service';
 import { UserService } from 'src/user/services/user.service';
 
@@ -139,7 +140,15 @@ export class OrderController {
     @AuthJwtAccessProtected()
     @RequestParamGuard(OrderRequestDto)
     @Get(':id')
-    async getById(@Param('id') id: string): Promise<BookEntity> {
+    async getById(
+        @Param('id') id: string,
+        @AuthUserId() userId: string
+    ): Promise<OrderDocument> {
+        const order = await this.orderService.findOneById(id);
+        if (!order || order.userId._id.toString() !== userId) {
+            throw new NotFoundException('Order not found');
+        }
+
         return this.orderService.findOneById(id);
     }
 }

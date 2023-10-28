@@ -15,7 +15,10 @@ export interface IOrderService {
         find?: Record<string, any>,
         options?: IDatabaseFindAllOptions
     ): Promise<OrderEntity[]>;
-    findOneById<T>(_id: string, options?: IDatabaseFindOneOptions): Promise<T>;
+    findOneById(
+        _id: string,
+        options?: IDatabaseFindOneOptions
+    ): Promise<OrderDocument>;
     findOne<T>(
         find: Record<string, any>,
         options?: IDatabaseFindOneOptions

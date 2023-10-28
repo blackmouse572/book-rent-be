@@ -26,7 +26,7 @@ export class OrderService implements IOrderService {
             join: true,
         });
     }
-    findOneById<OrderDocument>(
+    findOneById(
         _id: string,
         options?: IDatabaseFindOneOptions<any>
     ): Promise<OrderDocument> {
