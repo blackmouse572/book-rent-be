@@ -86,7 +86,6 @@ export class OrderEntity extends DatabaseMongoObjectIdEntityAbstract {
     @Prop({
         type: String,
         enum: ENUM_DEPOSIT_TYPE,
-        default: ENUM_DEPOSIT_TYPE.COD,
         required: true,
     })
     depositType: ENUM_DEPOSIT_TYPE;

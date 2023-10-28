@@ -17,6 +17,7 @@ import { BookService } from 'src/book/services/book.service';
 import {
     PaginationQuery,
     PaginationQueryFilterDate,
+    PaginationQueryFilterInEnum,
 } from 'src/common/pagination/decorators/pagination.decorator';
 import { PaginationListDto } from 'src/common/pagination/dto/pagination.list.dto';
 import { PaginationService } from 'src/common/pagination/services/pagination.service';
@@ -24,10 +25,16 @@ import { RequestParamGuard } from 'src/lib/guards/request.decorator';
 import {
     ORDER_DEFAULT_AVAILABLE_ORDER_BY,
     ORDER_DEFAULT_AVAILABLE_SEARCH,
+    ORDER_DEFAULT_DEPOSIT_TYPE,
     ORDER_DEFAULT_ORDER_BY,
     ORDER_DEFAULT_ORDER_DIRECTION,
     ORDER_DEFAULT_PERPAGE,
+    ORDER_DEFAULT_STATUS,
 } from 'src/order/constants/order.constant';
+import {
+    ENUM_DEPOSIT_TYPE,
+    ENUM_ORDER_STATUS,
+} from 'src/order/constants/order.enum';
 import { PlaceOrderDto } from 'src/order/dtos/create-order.dto';
 import { OrderRequestDto } from 'src/order/dtos/request-order.dto';
 import { OrderDocument } from 'src/order/repositories/order.entity';
@@ -92,13 +99,28 @@ export class OrderController {
         { _search, _limit, _offset, _order }: PaginationListDto,
         @PaginationQueryFilterDate('rentalDate')
         rentalDate: Record<string, any>,
-        @PaginationQueryFilterDate('returnDate') returnDate: Record<string, any>
+        @PaginationQueryFilterDate('returnDate')
+        returnDate: Record<string, any>,
+        @PaginationQueryFilterInEnum<ENUM_ORDER_STATUS[]>(
+            'status',
+            ORDER_DEFAULT_STATUS,
+            ENUM_ORDER_STATUS
+        )
+        _status: Record<string, any>,
+        @PaginationQueryFilterInEnum<ENUM_DEPOSIT_TYPE[]>(
+            'depositType',
+            ORDER_DEFAULT_DEPOSIT_TYPE,
+            ENUM_DEPOSIT_TYPE
+        )
+        _depositType: Record<string, any>
     ): Promise<any> {
         const { _id: userId } = payload;
         const find: Record<string, any> = {
             ..._search,
             ...rentalDate,
             ...returnDate,
+            ..._depositType,
+            ..._status,
             userId: new Types.ObjectId(userId),
         };
         const orders = await this.orderService.findAll(find, {
