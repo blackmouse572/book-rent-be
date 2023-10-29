@@ -11,7 +11,7 @@ import { UserDoc } from 'src/user/repository/user.entity';
 
 @Injectable()
 export class UserBlockedGuard implements CanActivate {
-    constructor(private reflector: Reflector) { }
+    constructor(private reflector: Reflector) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const required: boolean[] = this.reflector.getAllAndOverride<boolean[]>(

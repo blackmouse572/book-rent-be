@@ -18,4 +18,8 @@ export class CategoryRepository extends DatabaseMongoObjectIdRepositoryAbstract<
     ) {
         super(categoryModel);
     }
+
+    async count(criteria: Record<string, any> = {}): Promise<number> {
+        return this.categoryModel.countDocuments(criteria).exec();
+    }
 }
