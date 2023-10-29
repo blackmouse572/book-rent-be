@@ -13,9 +13,11 @@ import configs from 'src/configs';
 import { AppLoggerMiddleware } from 'src/lib/logger.middleware';
 import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
 import { AuthModule } from './auth/auth.module';
-import { HelpersModule } from './common/helpers/helpers.module';
-import { UserModule } from './user/user.module';
 import { CategoryModule } from './category/category.module';
+import { HelpersModule } from './common/helpers/helpers.module';
+import { OrderModule } from './order/order.module';
+import { TransactionModule } from './transaction/transaction.module';
+import { UserModule } from './user/user.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -109,6 +111,8 @@ import { CategoryModule } from './category/category.module';
         PaginationModule,
         UserModule,
         BookModule,
+        OrderModule,
+        TransactionModule,
         CategoryModule, // Integration of the CategoryModule
     ],
     controllers: [AppController],

@@ -10,6 +10,12 @@ import { AuthJwtRefreshGuard } from 'src/auth/guards/jwt-refresh-token/auth.refr
 import { RolePayloadTypeGuard } from 'src/auth/guards/role.payload.type.guard';
 import { ROLE_TYPE_META_KEY } from 'src/user/constants/user.constants';
 import { ENUM_ROLE_TYPE } from 'src/user/constants/user.enum.constants';
+export const AuthUserId = createParamDecorator(
+    (data: string, ctx: ExecutionContext): string => {
+        const { user } = ctx.switchToHttp().getRequest();
+        return user._id;
+    }
+);
 
 export const AuthJwtPayload = createParamDecorator(
     (data: string, ctx: ExecutionContext): Record<string, any> => {

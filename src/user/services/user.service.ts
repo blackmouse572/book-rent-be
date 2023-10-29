@@ -42,39 +42,39 @@ export class UserService implements IUserService {
         });
     }
 
-    async findOneById<T>(
+    async findOneById<UserDoc>(
         _id: string,
         options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOneById<T>(_id, options);
+    ): Promise<UserDoc> {
+        return this.userRepository.findOneById<UserDoc>(_id, options);
     }
 
-    async findOne<T>(
+    async findOne<UserDoc>(
         find: Record<string, any>,
         options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOne<T>(find, options);
+    ): Promise<UserDoc> {
+        return this.userRepository.findOne<UserDoc>(find, options);
     }
 
-    async findOneByUsername<T>(
+    async findOneByUsername<UserDoc>(
         username: string,
         options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOne<T>({ username }, options);
+    ): Promise<UserDoc> {
+        return this.userRepository.findOne<UserDoc>({ username }, options);
     }
 
-    async findOneByEmail<T>(
+    async findOneByEmail<UserDoc>(
         email: string,
         options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOne<T>({ email }, options);
+    ): Promise<UserDoc> {
+        return this.userRepository.findOne<UserDoc>({ email }, options);
     }
 
-    async findOneByPhoneNumber<T>(
+    async findOneByPhoneNumber<UserDoc>(
         phone: string,
         options?: IDatabaseFindOneOptions
-    ): Promise<T> {
-        return this.userRepository.findOne<T>({ phone }, options);
+    ): Promise<UserDoc> {
+        return this.userRepository.findOne<UserDoc>({ phone }, options);
     }
 
     async getTotal(
