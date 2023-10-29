@@ -1,12 +1,12 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { BookEntity } from 'src/book/repository/book.entity';
 import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
 import {
     ENUM_DEPOSIT_TYPE,
     ENUM_ORDER_STATUS,
 } from 'src/order/constants/order.enum';
+import { OrderCartEntity } from 'src/order/repositories/order-cart.enity';
 import { UserEntity } from 'src/user/repository/user.entity';
 
 export const OrderDatabaseName = 'orders';
@@ -15,12 +15,11 @@ export const OrderDatabaseName = 'orders';
 export class OrderEntity extends DatabaseMongoObjectIdEntityAbstract {
     @Prop({
         type: mongoose.Schema.Types.ObjectId,
-        ref: BookEntity.name,
+        ref: OrderCartEntity.name,
         required: true,
         autopopulate: true,
-        alias: 'book_id',
     })
-    bookId: BookEntity[];
+    cart: OrderCartEntity[];
 
     @Prop({
         type: mongoose.Schema.Types.ObjectId,

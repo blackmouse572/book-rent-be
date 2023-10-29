@@ -6,14 +6,25 @@ import { DATABASE_CONNECTION_NAME } from 'src/common/database/constants/database
 import { HelpersModule } from 'src/common/helpers/helpers.module';
 import { PaginationModule } from 'src/common/pagination/pagination.module';
 import { OrderController } from 'src/order/controllers/order.controller';
+import {
+    OrderCartEntity,
+    OrderCartSchema,
+} from 'src/order/repositories/order-cart.enity';
+import { OrderCartRepository } from 'src/order/repositories/order-cart.repository';
 import { OrderEntity, OrderSchema } from 'src/order/repositories/order.entity';
 import { OrderRepository } from 'src/order/repositories/order.repository';
+import { OrderCartService } from 'src/order/services/order-cart.service';
 import { OrderService } from 'src/order/services/order.service';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
     controllers: [OrderController],
-    providers: [OrderService, OrderRepository],
+    providers: [
+        OrderService,
+        OrderRepository,
+        OrderCartRepository,
+        OrderCartService,
+    ],
     exports: [OrderService],
     imports: [
         MongooseModule.forFeatureAsync(
@@ -22,6 +33,14 @@ import { UserModule } from 'src/user/user.module';
                     name: OrderEntity.name,
                     useFactory: () => {
                         const schema = OrderSchema;
+                        schema.plugin(autopopulate.default);
+                        return schema;
+                    },
+                },
+                {
+                    name: OrderCartEntity.name,
+                    useFactory: () => {
+                        const schema = OrderCartSchema;
                         schema.plugin(autopopulate.default);
                         return schema;
                     },

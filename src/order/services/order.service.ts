@@ -8,6 +8,7 @@ import {
 import { ENUM_ORDER_STATUS } from 'src/order/constants/order.enum';
 import { CreateOrderDTO, PlaceOrderDto } from 'src/order/dtos/create-order.dto';
 import { IOrderService } from 'src/order/interfaces/order-service.interface';
+import { OrderCartEntity } from 'src/order/repositories/order-cart.enity';
 import {
     OrderDocument,
     OrderEntity,
@@ -48,23 +49,26 @@ export class OrderService implements IOrderService {
     create(
         {
             pickupLocation,
-            quantity,
             rentalDate,
             returnDate,
             returnLocation,
             depositType,
-            bookId,
         }: PlaceOrderDto,
+        cart: OrderCartEntity[],
         userId: string,
         totalPrice: number,
         options?: IDatabaseCreateOptions
     ): Promise<OrderDocument> {
         return this.orderRepository.create<CreateOrderDTO>(
             {
-                bookId,
+                cart: cart.map((orderCart) => {
+                    return {
+                        bookId: orderCart.book._id.toString(),
+                        quantity: orderCart.quantity,
+                    };
+                }),
                 pickupLocation,
                 depositType,
-                quantity,
                 rentalDate,
                 returnDate,
                 returnLocation,

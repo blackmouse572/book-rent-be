@@ -107,4 +107,16 @@ export class BookService {
     ): Promise<boolean> {
         return this.bookRepository.deleteMany(find, options);
     }
+
+    async checkBookExist(id: string): Promise<boolean> {
+        return this.bookRepository.exists({ _id: id });
+    }
+
+    async checkManyBookExist(ids: string[]): Promise<boolean> {
+        return this.bookRepository.exists({ _id: { $in: ids } });
+    }
+
+    async findManyByIds(ids: string[]): Promise<BookDoc[]> {
+        return this.bookRepository.findAll({ _id: { $in: ids } });
+    }
 }

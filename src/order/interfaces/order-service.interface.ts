@@ -5,6 +5,7 @@ import {
     IDatabaseGetTotalOptions,
 } from 'src/common/database/interfaces/database.interface';
 import { PlaceOrderDto } from 'src/order/dtos/create-order.dto';
+import { OrderCartEntity } from 'src/order/repositories/order-cart.enity';
 import {
     OrderDocument,
     OrderEntity,
@@ -29,14 +30,13 @@ export interface IOrderService {
     ): Promise<number>;
     create(
         {
-            bookId,
             pickupLocation,
-            quantity,
             rentalDate,
             returnDate,
             returnLocation,
             depositType,
         }: PlaceOrderDto,
+        cart: OrderCartEntity[],
         userId: string,
         totalPrice: number,
         options?: IDatabaseCreateOptions

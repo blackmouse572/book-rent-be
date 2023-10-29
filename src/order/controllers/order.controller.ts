@@ -13,6 +13,7 @@ import {
     AuthJwtPayload,
     AuthUserId,
 } from 'src/auth/decorators/auth.jwt.decorator';
+import { BookEntity } from 'src/book/repository/book.entity';
 import { BookService } from 'src/book/services/book.service';
 import {
     PaginationQuery,
@@ -38,6 +39,7 @@ import {
 import { PlaceOrderDto } from 'src/order/dtos/create-order.dto';
 import { OrderRequestDto } from 'src/order/dtos/request-order.dto';
 import { OrderDocument } from 'src/order/repositories/order.entity';
+import { OrderCartService } from 'src/order/services/order-cart.service';
 import { OrderService } from 'src/order/services/order.service';
 import { UserService } from 'src/user/services/user.service';
 
@@ -47,6 +49,7 @@ import { UserService } from 'src/user/services/user.service';
 export class OrderController {
     constructor(
         private readonly orderService: OrderService,
+        private readonly orderCartService: OrderCartService,
         private readonly bookService: BookService,
         private readonly userService: UserService,
         private readonly paginationService: PaginationService
@@ -63,12 +66,13 @@ export class OrderController {
         @AuthJwtPayload() payload: Record<string, any>
     ) {
         const { _id: userId } = payload;
-        const { bookId, rentalDate, returnDate } = placeOrder;
+        const { rentalDate, returnDate, cart: _cart } = placeOrder;
+        const booksIds = _cart.map((item) => item.bookId);
+        const isBooksAvailable =
+            await this.bookService.checkManyBookExist(booksIds);
 
-        const book = await this.bookService.findOneById(bookId.toString());
-
-        if (!book) {
-            throw new NotFoundException('Book not found');
+        if (!isBooksAvailable) {
+            throw new NotFoundException(`One of books not found`);
         }
 
         if (rentalDate > returnDate) {
@@ -76,9 +80,11 @@ export class OrderController {
                 'Rental date must be less than return date'
             );
         }
-        const total_price = book.rental_price * placeOrder.quantity;
+        const books = await this.bookService.findAll(booksIds);
+        const total_price = this.calculatePrice(books, _cart);
+        const carts = await this.orderCartService.createMany(_cart);
 
-        return this.orderService.create(placeOrder, userId, total_price);
+        return this.orderService.create(placeOrder, carts, userId, total_price);
     }
 
     @ApiOperation({
@@ -172,5 +178,20 @@ export class OrderController {
         }
 
         return this.orderService.findOneById(id);
+    }
+
+    calculatePrice(
+        books: BookEntity[],
+        cart: { bookId: string; quantity: number }[]
+    ) {
+        let totalPrice = 0;
+        books.forEach((book) => {
+            const cartItem = cart.find(
+                (item) => item.bookId === book._id.toString()
+            );
+            totalPrice += book.rental_price * cartItem.quantity;
+        });
+
+        return totalPrice;
     }
 }

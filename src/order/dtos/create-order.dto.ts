@@ -9,20 +9,36 @@ import {
     IsString,
     Min,
 } from 'class-validator';
-import { Types } from 'mongoose';
 import {
     ENUM_DEPOSIT_TYPE,
     ENUM_ORDER_STATUS,
 } from 'src/order/constants/order.enum';
 
-export class PlaceOrderDto {
+export class PlaceOrderCartDto {
     @ApiProperty({
         example: faker.database.mongodbObjectId(),
         required: true,
     })
     @IsNotEmpty()
     @IsMongoId()
-    bookId: string | Types.ObjectId;
+    bookId: string;
+
+    @ApiProperty({
+        example: faker.number.int({ max: 10 }),
+        required: true,
+    })
+    @IsNotEmpty()
+    @IsNumber()
+    @Min(1)
+    quantity: number;
+}
+export class PlaceOrderDto {
+    @ApiProperty({
+        description: 'Cart of order',
+        required: true,
+        type: [PlaceOrderCartDto],
+    })
+    cart: PlaceOrderCartDto[];
 
     @ApiProperty({
         example: faker.date.future(),
@@ -39,15 +55,6 @@ export class PlaceOrderDto {
     @IsNotEmpty()
     @IsDateString()
     returnDate: Date;
-
-    @ApiProperty({
-        example: faker.number.int(),
-        required: true,
-    })
-    @IsNotEmpty()
-    @IsNumber()
-    @Min(1)
-    quantity: number;
 
     @ApiProperty({
         example: faker.location.streetAddress(),
