@@ -9,7 +9,6 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { DATABASE_CONNECTION_NAME } from 'src/common/database/constants/database.constraint';
 import { HelpersModule } from 'src/common/helpers/helpers.module';
 import { PaginationModule } from 'src/common/pagination/pagination.module';
-import { GenreModule } from 'src/genre/genre.module';
 
 @Module({
     controllers: [BookController],
@@ -27,7 +26,6 @@ import { GenreModule } from 'src/genre/genre.module';
             ],
             DATABASE_CONNECTION_NAME
         ),
-        GenreModule,
         CategoryModule,
         CloudinaryModule,
     ],
