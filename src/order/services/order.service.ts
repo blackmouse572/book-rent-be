@@ -6,7 +6,7 @@ import {
     IDatabaseGetTotalOptions,
 } from 'src/common/database/interfaces/database.interface';
 import { ENUM_ORDER_STATUS } from 'src/order/constants/order.enum';
-import { CreateOrderDTO, PlaceOrderDto } from 'src/order/dtos/create-order.dto';
+import { PlaceOrderDto } from 'src/order/dtos/create-order.dto';
 import { IOrderService } from 'src/order/interfaces/order-service.interface';
 import { OrderCartEntity } from 'src/order/repositories/order-cart.enity';
 import {
@@ -59,22 +59,17 @@ export class OrderService implements IOrderService {
         totalPrice: number,
         options?: IDatabaseCreateOptions
     ): Promise<OrderDocument> {
-        return this.orderRepository.create<CreateOrderDTO>(
+        return this.orderRepository.create(
             {
-                cart: cart.map((orderCart) => {
-                    return {
-                        bookId: orderCart.book._id.toString(),
-                        quantity: orderCart.quantity,
-                    };
-                }),
                 pickupLocation,
                 depositType,
                 rentalDate,
                 returnDate,
                 returnLocation,
-                status: ENUM_ORDER_STATUS.PENDING,
                 totalPrice,
                 userId,
+                status: ENUM_ORDER_STATUS.PENDING,
+                cart: cart.map((orderCart) => orderCart._id),
             },
             options
         );

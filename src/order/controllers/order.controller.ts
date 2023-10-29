@@ -7,12 +7,13 @@ import {
     Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import {
     AuthJwtAccessProtected,
     AuthJwtPayload,
     AuthUserId,
 } from 'src/auth/decorators/auth.jwt.decorator';
+import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
 import { BookEntity } from 'src/book/repository/book.entity';
 import { BookService } from 'src/book/services/book.service';
 import {
@@ -67,11 +68,15 @@ export class OrderController {
     ) {
         const { _id: userId } = payload;
         const { rentalDate, returnDate, cart: _cart } = placeOrder;
-        const booksIds = _cart.map((item) => item.bookId);
-        const isBooksAvailable =
-            await this.bookService.checkManyBookExist(booksIds);
+        const booksIds = _cart.map(
+            (item) => new mongoose.Types.ObjectId(item.bookId)
+        );
+        const books = await this.bookService.findAll({
+            _id: { $in: booksIds },
+            status: BOOK_STATUS_ENUM.ENABLE,
+        });
 
-        if (!isBooksAvailable) {
+        if (books.length !== booksIds.length) {
             throw new NotFoundException(`One of books not found`);
         }
 
@@ -80,9 +85,13 @@ export class OrderController {
                 'Rental date must be less than return date'
             );
         }
-        const books = await this.bookService.findAll(booksIds);
         const total_price = this.calculatePrice(books, _cart);
-        const carts = await this.orderCartService.createMany(_cart);
+        const carts = await this.orderCartService.createMany(
+            _cart.map((item) => ({
+                book: item.bookId,
+                quantity: item.quantity,
+            }))
+        );
 
         return this.orderService.create(placeOrder, carts, userId, total_price);
     }

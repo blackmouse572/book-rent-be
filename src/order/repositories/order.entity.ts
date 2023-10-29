@@ -14,7 +14,7 @@ export const OrderDatabaseName = 'orders';
 @DatabaseEntity({ collection: OrderDatabaseName })
 export class OrderEntity extends DatabaseMongoObjectIdEntityAbstract {
     @Prop({
-        type: mongoose.Schema.Types.ObjectId,
+        type: [mongoose.Schema.Types.ObjectId],
         ref: OrderCartEntity.name,
         required: true,
         autopopulate: true,
@@ -75,12 +75,6 @@ export class OrderEntity extends DatabaseMongoObjectIdEntityAbstract {
         default: ENUM_ORDER_STATUS.PENDING,
     })
     status: ENUM_ORDER_STATUS;
-
-    @Prop({
-        type: Number,
-        required: true,
-    })
-    quantity: number;
 
     @Prop({
         type: String,

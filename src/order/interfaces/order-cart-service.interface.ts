@@ -23,10 +23,10 @@ export interface IOrderCartService {
     ): Promise<T>;
     create(
         {
-            bookId,
+            book,
             quantity,
         }: {
-            bookId: string;
+            book: string;
             quantity: number;
         },
         options?: IDatabaseCreateOptions
@@ -34,7 +34,7 @@ export interface IOrderCartService {
 
     createMany(
         orderCarts: {
-            bookId: string;
+            book: string;
             quantity: number;
         }[],
         options?: IDatabaseCreateOptions

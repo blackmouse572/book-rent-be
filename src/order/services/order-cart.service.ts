@@ -32,12 +32,12 @@ export class OrderCartService implements IOrderCartService {
     }
 
     create(
-        { bookId, quantity }: { bookId: string; quantity: number },
+        { book, quantity }: { book: string; quantity: number },
         options?: IDatabaseCreateOptions<any>
     ): Promise<OrderCartDocument> {
         return this.orderCartRepository.create(
             {
-                bookId,
+                book,
                 quantity,
             },
             options
@@ -45,13 +45,19 @@ export class OrderCartService implements IOrderCartService {
     }
 
     async createMany(
-        orderCarts: { bookId: string; quantity: number }[],
+        orderCarts: { book: string; quantity: number }[],
         options?: IDatabaseCreateOptions<any>
     ): Promise<OrderCartDocument[]> {
         const orderCartDocs = await Promise.all(
             orderCarts.map(async (orderCart) => {
-                const { bookId, quantity } = orderCart;
-                return await this.create({ bookId, quantity }, options);
+                const { book, quantity } = orderCart;
+                return await this.create(
+                    {
+                        book,
+                        quantity,
+                    },
+                    options
+                );
             })
         );
 

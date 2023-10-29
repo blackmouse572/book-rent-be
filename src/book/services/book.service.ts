@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import mongoose, { Types } from 'mongoose';
 import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
 import { BookUpdateDto } from 'src/book/dtos/update-book.dto';
 import { BookDoc, BookEntity } from 'src/book/repository/book.entity';
@@ -113,10 +114,12 @@ export class BookService {
     }
 
     async checkManyBookExist(ids: string[]): Promise<boolean> {
-        return this.bookRepository.exists({ _id: { $in: ids } });
+        const objectIds = ids.map((id) => new mongoose.Types.ObjectId(id));
+        return this.bookRepository.exists({ _id: { $in: objectIds } });
     }
 
     async findManyByIds(ids: string[]): Promise<BookDoc[]> {
-        return this.bookRepository.findAll({ _id: { $in: ids } });
+        const objectIds = ids.map((id) => new Types.ObjectId(id));
+        return this.bookRepository.findAll({ _id: { $in: objectIds } });
     }
 }
