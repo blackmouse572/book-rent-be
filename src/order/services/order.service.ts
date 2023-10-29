@@ -74,4 +74,11 @@ export class OrderService implements IOrderService {
             options
         );
     }
+
+    save(
+        order: OrderDocument,
+        options?: IDatabaseCreateOptions
+    ): Promise<OrderDocument> {
+        return this.orderRepository.save(order, options);
+    }
 }

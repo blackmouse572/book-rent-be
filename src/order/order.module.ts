@@ -6,6 +6,7 @@ import { DATABASE_CONNECTION_NAME } from 'src/common/database/constants/database
 import { HelpersModule } from 'src/common/helpers/helpers.module';
 import { PaginationModule } from 'src/common/pagination/pagination.module';
 import { OrderController } from 'src/order/controllers/order.controller';
+import { OrderManageController } from 'src/order/controllers/order.manage.controller';
 import {
     OrderCartEntity,
     OrderCartSchema,
@@ -18,7 +19,7 @@ import { OrderService } from 'src/order/services/order.service';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-    controllers: [OrderController],
+    controllers: [OrderController, OrderManageController],
     providers: [
         OrderService,
         OrderRepository,

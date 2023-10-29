@@ -82,8 +82,34 @@ export class OrderEntity extends DatabaseMongoObjectIdEntityAbstract {
         required: true,
     })
     depositType: ENUM_DEPOSIT_TYPE;
+
+    @Prop({
+        type: Number,
+        default: 0,
+    })
+    deposit: number;
+
+    @Prop({
+        type: Number,
+        default: 0,
+    })
+    penalty: number;
+
+    @Prop({
+        type: String,
+        trim: true,
+        maxlength: 500,
+    })
+    penaltyReason: string;
 }
 
 export const OrderSchema = SchemaFactory.createForClass(OrderEntity);
 
 export type OrderDocument = HydratedDocument<OrderEntity>;
+
+OrderSchema.pre('save', function (next) {
+    if (this.isNew) {
+        this.deposit = this.totalPrice * 0.2;
+    }
+    next();
+});

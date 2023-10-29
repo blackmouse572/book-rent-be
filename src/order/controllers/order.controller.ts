@@ -42,7 +42,6 @@ import { OrderRequestDto } from 'src/order/dtos/request-order.dto';
 import { OrderDocument } from 'src/order/repositories/order.entity';
 import { OrderCartService } from 'src/order/services/order-cart.service';
 import { OrderService } from 'src/order/services/order.service';
-import { UserService } from 'src/user/services/user.service';
 
 @ApiBearerAuth('accessToken')
 @ApiTags('modules.authenticated.order')
@@ -52,7 +51,6 @@ export class OrderController {
         private readonly orderService: OrderService,
         private readonly orderCartService: OrderCartService,
         private readonly bookService: BookService,
-        private readonly userService: UserService,
         private readonly paginationService: PaginationService
     ) {}
 
@@ -97,7 +95,7 @@ export class OrderController {
     }
 
     @ApiOperation({
-        summary: 'Get all orders',
+        summary: 'Get all orders belong to current user',
         description: 'Get all orders',
     })
     @AuthJwtAccessProtected()
