@@ -1,17 +1,10 @@
-import {
-    Body,
-    Controller,
-    ForbiddenException,
-    Get,
-    Patch,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import {
     AuthJwtAccessProtected,
     AuthJwtPayload,
 } from 'src/auth/decorators/auth.jwt.decorator';
 import { GetUser, UserProtected } from 'src/user/decorators/user.decorator';
-import { UserChangePasswordDto } from 'src/user/dtos/change-password.dto';
 import { UserUpdateDto } from 'src/user/dtos/update-user.dto';
 import { UserDoc } from 'src/user/repository/user.entity';
 import { UserService } from 'src/user/services/user.service';
@@ -56,7 +49,6 @@ export class UserController {
     async updateProfile(@GetUser() user: UserDoc, @Body() body: UserUpdateDto) {
         await this.userService.updateName(user, body);
         await this.userService.updateAddress(user, body);
-
         return;
     }
 }

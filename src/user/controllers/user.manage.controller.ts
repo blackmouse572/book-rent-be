@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthJwtAdminAccessProtected } from 'src/auth/decorators/auth.jwt.decorator';
 import {
@@ -22,9 +22,9 @@ import {
     USER_DEFAULT_ROLE,
 } from 'src/user/constants/user.list-constants';
 import { UserAdminGetGuard } from 'src/user/decorators/user.admin.decorator';
-import { GetUser, UserProtected } from 'src/user/decorators/user.decorator';
+import { GetUser } from 'src/user/decorators/user.decorator';
 import { UserRequestDto } from 'src/user/dtos/get-user.dto';
-import { IUserDoc, IUserEntity } from 'src/user/interfaces/user.interface';
+import { IUserEntity } from 'src/user/interfaces/user.interface';
 import { UserDoc } from 'src/user/repository/user.entity';
 import { UserService } from 'src/user/services/user.service';
 @ApiTags('modules.admin.user')
@@ -100,5 +100,19 @@ export class UserManageController {
     @Get('/get/:user')
     async get(@GetUser() user: UserDoc): Promise<any> {
         return { data: user.toObject() };
+    }
+
+    @UserAdminGetGuard()
+    @RequestParamGuard(UserRequestDto)
+    @AuthJwtAdminAccessProtected()
+    @Get('/seed')
+    async seed(@Query('amount') amount: number = 30) {
+        const users = Array.from(Array(amount).keys()).map((index: number) => {
+            return {
+                email: ` ${index} ${new Date().getTime()}@gmail.com`,
+                password: '123456',
+            };
+        });
+        return users;
     }
 }
