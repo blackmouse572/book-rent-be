@@ -1,84 +1,94 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
+    ArrayNotEmpty,
     IsArray,
+    IsEnum,
+    IsNotEmpty,
     IsNumber,
+    IsOptional,
     IsString,
     MaxLength,
     Min,
-    ValidateNested,
 } from 'class-validator';
+import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
 
-export class BookUpdateDto {
+export class UpdateBookDto {
     @ApiProperty({
         example: faker.music.songName(),
     })
     @IsString()
     @MaxLength(100)
-    readonly name?: string;
+    readonly name: string;
 
     @ApiProperty({
         example: faker.commerce.price(),
+        type: 'integer',
     })
+    @Type(() => Number)
     @IsNumber()
     @Min(0)
-    readonly rental_price?: number;
+    readonly rental_price: number;
 
     @ApiProperty({
-        example: faker.helpers.multiple(() => faker.string.uuid(), {
-            count: 3,
-        }),
+        example: faker.helpers.multiple(
+            () => faker.database.mongodbObjectId(),
+            {
+                count: 3,
+            }
+        ),
         description: 'Category Id',
     })
+    @Transform(({ value }) => JSON.parse(value))
     @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => String)
-    readonly category?: string[];
+    @ArrayNotEmpty()
+    readonly category: string[];
 
     @ApiProperty({
         example: faker.lorem.paragraph(),
     })
+    @IsNotEmpty()
     @IsString()
-    @Type(() => String)
-    readonly description?: string;
-
-    @ApiProperty({
-        example: faker.image.url(),
-    })
-    @IsString()
-    @MaxLength(225)
-    readonly image?: string;
-
-    @ApiProperty({
-        example: faker.commerce.price(),
-    })
-    @IsNumber()
-    @Min(0)
-    readonly deposit?: number;
+    readonly description: string;
 
     @ApiProperty({
         example: faker.word.words(),
     })
+    @IsNotEmpty()
     @IsString()
     @MaxLength(225)
-    readonly keyword?: string;
+    readonly keyword: string;
 
     @ApiProperty({
-        example: faker.helpers.multiple(() => faker.string.uuid(), {
+        example: faker.helpers.multiple(() => faker.music.genre(), {
             count: 3,
         }),
-        description: 'Genres Id',
     })
+    @Transform(({ value }) => JSON.parse(value))
     @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => String)
-    readonly genres?: string[];
+    readonly genres: string[];
 
     @ApiProperty({
         example: faker.person.fullName(),
     })
+    @IsNotEmpty()
     @IsString()
     @MaxLength(50)
-    readonly author?: string;
+    readonly author: string;
+
+    @ApiProperty({
+        type: 'string',
+        format: 'binary',
+        required: false,
+    })
+    @IsOptional()
+    readonly image: Express.Multer.File;
+
+    @ApiProperty({
+        enum: BOOK_STATUS_ENUM,
+    })
+    @IsNotEmpty()
+    @IsEnum(BOOK_STATUS_ENUM)
+    readonly status: BOOK_STATUS_ENUM;
 }

@@ -7,7 +7,6 @@ import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
 import { CategoryEntity } from 'src/category/repository/category.entity';
 import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
-import { GenreEntity } from 'src/genre/repository/genre.entity';
 import { ReviewEntity } from 'src/review/repository/review.entity';
 
 export const BookDatabaseName = 'books';
@@ -31,7 +30,7 @@ export class BookEntity extends DatabaseMongoObjectIdEntityAbstract {
     rental_price: number;
 
     @Prop({
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'categories' }],
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'CategoryEntity' }],
     })
     category: CategoryEntity[];
 
@@ -61,13 +60,6 @@ export class BookEntity extends DatabaseMongoObjectIdEntityAbstract {
     status: BOOK_STATUS_ENUM;
 
     @Prop({
-        required: true,
-        default: 0,
-        type: Number,
-    })
-    deposit: number;
-
-    @Prop({
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'reviews' }],
     })
     reviews: ReviewEntity[];
@@ -82,10 +74,8 @@ export class BookEntity extends DatabaseMongoObjectIdEntityAbstract {
     })
     keyword: string;
 
-    @Prop({
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'genres' }],
-    })
-    genres: GenreEntity[];
+    @Prop([String])
+    genres: string[];
 
     @Prop({
         required: true,

@@ -1,17 +1,18 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
 import {
     ArrayNotEmpty,
     IsArray,
     IsNotEmpty,
     IsNumber,
+    IsOptional,
     IsString,
     MaxLength,
     Min,
 } from 'class-validator';
-import { GenreCreateDto } from 'src/genre/dtos/create-genre.dto';
 
-export class BookCreateDto {
+export class CreateBookDto {
     @ApiProperty({
         example: faker.music.songName(),
         required: true,
@@ -26,6 +27,7 @@ export class BookCreateDto {
         required: true,
         type: 'integer',
     })
+    @Type(() => Number)
     @IsNotEmpty()
     @IsNumber()
     @Min(0)
@@ -41,6 +43,7 @@ export class BookCreateDto {
         required: true,
         description: 'Category Id',
     })
+    @Transform(({ value }) => JSON.parse(value))
     @IsArray()
     @ArrayNotEmpty()
     readonly category: string[];
@@ -54,15 +57,6 @@ export class BookCreateDto {
     readonly description: string;
 
     @ApiProperty({
-        example: faker.commerce.price(),
-        required: true,
-    })
-    @IsNotEmpty()
-    @IsNumber()
-    @Min(0)
-    readonly deposit: number;
-
-    @ApiProperty({
         example: faker.word.words(),
         required: true,
     })
@@ -72,13 +66,17 @@ export class BookCreateDto {
     readonly keyword: string;
 
     @ApiProperty({
+        example: faker.helpers.multiple(() => faker.music.genre(), {
+            count: 3,
+        }),
         required: true,
-        description: 'Genres datas',
-        type: [GenreCreateDto],
+        description: 'Category Id',
     })
+    @Transform(({ value }) => JSON.parse(value))
     @IsArray()
     @ArrayNotEmpty()
-    readonly genres: GenreCreateDto[];
+    @IsOptional()
+    readonly genres: string[];
 
     @ApiProperty({
         example: faker.person.fullName(),
@@ -92,7 +90,7 @@ export class BookCreateDto {
     @ApiProperty({
         type: 'string',
         format: 'binary',
-        required: true,
+        required: false,
     })
     readonly image: Express.Multer.File;
 }
