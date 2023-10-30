@@ -48,7 +48,7 @@ export class BookController {
         tags: ['book'],
         description: 'create book',
     })
-    // @AuthJwtAdminAccessProtected()
+    @AuthJwtAdminAccessProtected()
     @Post()
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('image'))
@@ -72,7 +72,7 @@ export class BookController {
         }
 
         const result = await this.bookService.create(dto, categorys, file);
-        return result;
+        return result.populate('category');
     }
 
     @ApiOperation({
@@ -85,7 +85,7 @@ export class BookController {
         if (!result) {
             throw new NotFoundException({ message: 'book not found' });
         }
-        return result;
+        return result.populate('category');
     }
 
     @ApiOperation({
@@ -124,7 +124,7 @@ export class BookController {
             throw new NotFoundException(`Cannot found book with id: ${id}`);
         }
 
-        let categorys;
+        const categorys: CategoryDoc[] = [];
         if (dto.category) {
             for (const id of dto.category) {
                 const category = await this.categoryService.findOneById(id);
@@ -172,6 +172,7 @@ export class BookController {
                 offset: _offset,
             },
             order: _order,
+            join: { path: 'category' },
         });
 
         const total: number = await this.bookService.getTotal(find);
@@ -184,5 +185,21 @@ export class BookController {
             _pagination: { total, totalPage },
             data: books,
         };
+    }
+
+    @ApiOperation({
+        tags: ['book'],
+        description: 'Change book status by Id',
+    })
+    @AuthJwtAdminAccessProtected()
+    @Put('status/:id')
+    async changeStatus(@Param('id') id: string) {
+        const bookDoc = await this.bookService.findOneById(id);
+        if (!bookDoc) {
+            throw new NotFoundException(`Cannot found book with id: ${id}`);
+        }
+
+        const result = await this.bookService.changeStatus(bookDoc);
+        return result.populate('category');
     }
 }

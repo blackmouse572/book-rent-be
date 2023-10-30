@@ -33,15 +33,16 @@ export class BookService {
             bookDoc.image = infor.secure_url;
         }
 
-        bookDoc.author ??= dto.author;
-        bookDoc.name ??= dto.name;
-        bookDoc.category ??= categorys;
-        bookDoc.description ??= dto.description;
-        bookDoc.genres ??= dto.genres;
-        bookDoc.keyword ??= dto.keyword;
-        bookDoc.name ??= dto.name;
-        bookDoc.rental_price ??= dto.rental_price;
-        bookDoc.status ??= dto.status;
+        bookDoc.author = dto.author;
+        bookDoc.name = dto.name;
+        bookDoc.category = categorys;
+        bookDoc.description = dto.description;
+        bookDoc.genres = dto.genres;
+        bookDoc.keyword = dto.keyword;
+        bookDoc.name = dto.name;
+        bookDoc.rental_price = dto.rental_price;
+        bookDoc.status = dto.status;
+        console.log(dto);
         return this.bookRepository.save(bookDoc, options);
     }
 
@@ -51,7 +52,7 @@ export class BookService {
     ): Promise<BookEntity[]> {
         return this.bookRepository.findAll<BookEntity>(find, {
             ...options,
-            join: true,
+            join: { path: 'category' },
         });
     }
 
@@ -130,5 +131,17 @@ export class BookService {
         options?: IDatabaseManyOptions
     ): Promise<boolean> {
         return this.bookRepository.deleteMany(find, options);
+    }
+
+    async changeStatus(
+        repository: BookDoc,
+        options?: IDatabaseSaveOptions
+    ): Promise<BookDoc> {
+        if (repository.status === BOOK_STATUS_ENUM.DISABLE) {
+            repository.status = BOOK_STATUS_ENUM.ENABLE;
+        } else {
+            repository.status = BOOK_STATUS_ENUM.DISABLE;
+        }
+        return this.bookRepository.save(repository, options);
     }
 }

@@ -30,7 +30,7 @@ export class BookEntity extends DatabaseMongoObjectIdEntityAbstract {
     rental_price: number;
 
     @Prop({
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'categories' }],
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'CategoryEntity' }],
     })
     category: CategoryEntity[];
 
