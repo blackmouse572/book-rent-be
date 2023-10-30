@@ -94,6 +94,8 @@ import { UserModule } from './user/user.module';
                 CLOUDINARY_NAME: Joi.string().required(),
                 CLOUDINARY_API_KEY: Joi.string().required(),
                 CLOUDINARY_API_SECRET: Joi.string().required(),
+                VNPAY_TMNCODE: Joi.string().required(),
+                VNPAY_HASHSECRET: Joi.string().required(),
             }),
             validationOptions: {
                 allowUnknown: true,
