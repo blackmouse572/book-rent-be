@@ -77,6 +77,53 @@ export class BookController {
 
     @ApiOperation({
         tags: ['book'],
+        description: 'Get list of books in database',
+        summary: 'List book',
+    })
+    @Get('/list')
+    async list(
+        @PaginationQuery(
+            BOOK_DEFAULT_PER_PAGE,
+            BOOK_DEFAULT_ORDER_BY,
+            BOOK_DEFAULT_ORDER_DIRECTION,
+            BOOK_DEFAULT_AVAILABLE_SEARCH,
+            BOOK_DEFAULT_AVAILABLE_ORDER_BY
+        )
+        { _search, _limit, _offset, _order }: PaginationListDto,
+        @PaginationQueryFilterInEnum(
+            'status',
+            BOOK_DEFAULT_STATUS,
+            BOOK_STATUS_ENUM
+        )
+        status: Record<string, any>
+    ) {
+        const find: Record<string, any> = {
+            ..._search,
+            ...status,
+        };
+
+        const books: BookEntity[] = await this.bookService.findAll(find, {
+            paging: {
+                limit: _limit,
+                offset: _offset,
+            },
+            order: _order,
+            join: { path: 'category' },
+        });
+
+        const total: number = await this.bookService.getTotal(find);
+        const totalPage: number = this.paginationService.totalPage(
+            total,
+            _limit
+        );
+
+        return {
+            _pagination: { total, totalPage },
+            data: books,
+        };
+    }
+    @ApiOperation({
+        tags: ['book'],
         description: 'get book by id',
     })
     @Get('/:id')
@@ -137,54 +184,6 @@ export class BookController {
         }
 
         return await this.bookService.update(bookDoc, dto, categorys, file);
-    }
-
-    @ApiOperation({
-        description: 'Get list of users in database',
-        summary: 'List user',
-    })
-    @AuthJwtAdminAccessProtected()
-    @Get('/list')
-    async list(
-        @PaginationQuery(
-            BOOK_DEFAULT_PER_PAGE,
-            BOOK_DEFAULT_ORDER_BY,
-            BOOK_DEFAULT_ORDER_DIRECTION,
-            BOOK_DEFAULT_AVAILABLE_SEARCH,
-            BOOK_DEFAULT_AVAILABLE_ORDER_BY
-        )
-        { _search, _limit, _offset, _order }: PaginationListDto,
-        @PaginationQueryFilterInEnum(
-            'status',
-            BOOK_DEFAULT_STATUS,
-            BOOK_STATUS_ENUM
-        )
-        status: Record<string, any>
-    ) {
-        const find: Record<string, any> = {
-            ..._search,
-            ...status,
-        };
-
-        const books: BookEntity[] = await this.bookService.findAll(find, {
-            paging: {
-                limit: _limit,
-                offset: _offset,
-            },
-            order: _order,
-            join: { path: 'category' },
-        });
-
-        const total: number = await this.bookService.getTotal(find);
-        const totalPage: number = this.paginationService.totalPage(
-            total,
-            _limit
-        );
-
-        return {
-            _pagination: { total, totalPage },
-            data: books,
-        };
     }
 
     @ApiOperation({
