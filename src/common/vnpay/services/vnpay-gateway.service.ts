@@ -65,7 +65,7 @@ export class VNPayGatewayService {
         payParams['vnp_Locale'] = locale;
         payParams['vnp_OrderInfo'] = orderInfo;
         payParams['vnp_OrderType'] = 'other';
-        payParams['vpn_ReturnUrl'] = returnUrl;
+        payParams['vnp_ReturnUrl'] = returnUrl;
         payParams['vnp_TmnCode'] = this.tmpCode;
         payParams['vnp_TxnRef'] = nanoid();
         payParams['vnp_Version'] = '2.1.0';
@@ -89,29 +89,7 @@ export class VNPayGatewayService {
         return finalUrl;
     }
 
-    async processPayment(data: CreatePaymentLink) {
-        const { amount, ipAddr, locale, orderInfo, returnUrl } = data;
-        return this.vnpay.buildCheckoutUrl({
-            amount,
-            clientIp: ipAddr,
-            currency: 'VND',
-            locale,
-            orderId: nanoid(),
-            orderInfo,
-            orderType: 'fashion',
-            returnUrl,
-            transactionId: nanoid(),
-            vnpSecretKey: this.hashSecret,
-            vnpMerchant: this.tmpCode,
-            vnpCommand: 'pay',
-            vnpVersion: '2',
-            paymentGateway: this.paymentGateway,
-            merchant: this.tmpCode,
-            secureSecret: this.hashSecret,
-        });
-    }
-
-    sortObject(obj: any): any {
+    private sortObject(obj: any): any {
         const sorted = {};
         const str = [];
         let key;
