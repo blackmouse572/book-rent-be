@@ -31,6 +31,8 @@ import { CategoryDoc } from 'src/category/repository/category.entity';
 import { CategoryService } from 'src/category/services/category.service';
 import {
     PaginationQuery,
+    PaginationQueryFilterEqual,
+    PaginationQueryFilterEqualObjectId,
     PaginationQueryFilterInEnum,
 } from 'src/common/pagination/decorators/pagination.decorator';
 import { PaginationListDto } from 'src/common/pagination/dto/pagination.list.dto';
@@ -95,11 +97,16 @@ export class BookController {
             BOOK_DEFAULT_STATUS,
             BOOK_STATUS_ENUM
         )
-        status: Record<string, any>
+        status: Record<string, any>,
+        @PaginationQueryFilterEqualObjectId('category')
+        category: Record<string, any>,
+        @PaginationQueryFilterEqual('genres') genres: Record<string, any>
     ) {
         const find: Record<string, any> = {
             ..._search,
             ...status,
+            ...category,
+            ...genres,
         };
 
         const books: BookEntity[] = await this.bookService.findAll(find, {
@@ -153,11 +160,28 @@ export class BookController {
     async delete(@Param('id') _id: string): Promise<BookDoc> {
         return this.bookService.delete(_id);
     }
+
+    @ApiOperation({
+        tags: ['book'],
+        description: 'Change book status by Id',
+    })
+    @AuthJwtAdminAccessProtected()
+    @Put('status/:id')
+    async changeStatus(@Param('id') id: string) {
+        const bookDoc = await this.bookService.findOneById(id);
+        if (!bookDoc) {
+            throw new NotFoundException(`Cannot found book with id: ${id}`);
+        }
+
+        const result = await this.bookService.changeStatus(bookDoc);
+        return result.populate('category');
+    }
+
     @ApiOperation({
         tags: ['book'],
         description: 'update book by Id',
     })
-    @AuthJwtAdminAccessProtected()
+    // @AuthJwtAdminAccessProtected()
     @Put('/:id')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('image'))
@@ -184,21 +208,5 @@ export class BookController {
         }
 
         return await this.bookService.update(bookDoc, dto, categorys, file);
-    }
-
-    @ApiOperation({
-        tags: ['book'],
-        description: 'Change book status by Id',
-    })
-    @AuthJwtAdminAccessProtected()
-    @Put('status/:id')
-    async changeStatus(@Param('id') id: string) {
-        const bookDoc = await this.bookService.findOneById(id);
-        if (!bookDoc) {
-            throw new NotFoundException(`Cannot found book with id: ${id}`);
-        }
-
-        const result = await this.bookService.changeStatus(bookDoc);
-        return result.populate('category');
     }
 }
