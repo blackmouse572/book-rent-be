@@ -181,7 +181,7 @@ export class BookController {
         tags: ['book'],
         description: 'update book by Id',
     })
-    // @AuthJwtAdminAccessProtected()
+    @AuthJwtAdminAccessProtected()
     @Put('/:id')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('image'))
