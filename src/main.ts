@@ -4,8 +4,9 @@ import { NestApplication, NestFactory } from '@nestjs/core';
 import { useContainer } from 'class-validator';
 import cookieParser from 'cookie-parser';
 import useCors from 'src/lib/cors';
-import { AppModule } from './app.module';
 import initSwagger from 'src/lib/swagger';
+import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
     const app: NestApplication = await NestFactory.create(AppModule);
@@ -25,7 +26,12 @@ async function bootstrap() {
     app.use(cookieParser());
     useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-    useCors(app);
+    useCors(app, {
+        origin:
+            env === ENUM_APP_ENVIROMENT.PROD
+                ? /^book-rent-(.+).vercel.app$/
+                : 'http://localhost:5173',
+    });
     await app.listen(port);
 
     logger.log('************************************');

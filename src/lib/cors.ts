@@ -1,6 +1,7 @@
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { NestApplication } from '@nestjs/core';
 
-export default function useCors(app: NestApplication) {
+export default function useCors(app: NestApplication, options?: CorsOptions) {
     const allowedHeaders = [
         'Access-Control-Allow-Origin',
         'Access-Control-Origin',
@@ -17,13 +18,12 @@ export default function useCors(app: NestApplication) {
         'Authorization',
     ];
     const allowedMethods = 'GET,HEAD,PUT,PATCH,POST,DELETE';
-    // const origins = ['http://localhost:5173', 'http://localhost:3000'];
 
     app.enableCors({
+        ...options,
         allowedHeaders,
         maxAge: 3600,
         methods: allowedMethods,
-        origin: true,
         credentials: true,
     });
 
