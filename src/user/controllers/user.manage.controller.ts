@@ -1,5 +1,13 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+    BadRequestException,
+    Controller,
+    Get,
+    NotFoundException,
+    Param,
+    Post,
+    Query,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthJwtAdminAccessProtected } from 'src/auth/decorators/auth.jwt.decorator';
 import {
     PaginationQuery,
@@ -21,13 +29,17 @@ import {
     USER_DEFAULT_PER_PAGE,
     USER_DEFAULT_ROLE,
 } from 'src/user/constants/user.list-constants';
-import { UserAdminGetGuard } from 'src/user/decorators/user.admin.decorator';
-import { GetUser } from 'src/user/decorators/user.decorator';
+import {
+    UserAdminGetGuard,
+    UserAdminUpdateBlockedGuard,
+    UserAdminUpdateGuard,
+} from 'src/user/decorators/user.admin.decorator';
 import { UserRequestDto } from 'src/user/dtos/get-user.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
 import { UserDoc } from 'src/user/repository/user.entity';
 import { UserService } from 'src/user/services/user.service';
 @ApiTags('modules.admin.user')
+@ApiBearerAuth('accessToken')
 @Controller({
     path: '/user',
 })
@@ -43,6 +55,7 @@ export class UserManageController {
         description: 'Get list of users in database',
         summary: 'List user',
     })
+    @UserAdminUpdateGuard()
     @AuthJwtAdminAccessProtected()
     @Get('/list')
     async list(
@@ -98,8 +111,55 @@ export class UserManageController {
     @RequestParamGuard(UserRequestDto)
     @AuthJwtAdminAccessProtected()
     @Get('/get/:user')
-    async get(@GetUser() user: UserDoc): Promise<any> {
-        return { data: user.toObject() };
+    async get(@Param('user') userId: string): Promise<any> {
+        const user = await this.userService.findOneById(userId);
+        return user;
+    }
+
+    @UserAdminUpdateGuard()
+    @UserAdminUpdateBlockedGuard()
+    @ApiOperation({
+        summary: "Ban user's account",
+        description: 'Ban user account, this will prevent user from login',
+        tags: ['admin', 'user'],
+    })
+    @RequestParamGuard(UserRequestDto)
+    @Post('/ban/:user')
+    async banUser(@Param() userId: string) {
+        const user: UserDoc = await this.userService.findOneById(userId);
+        if (user) {
+            throw new NotFoundException('User not found');
+        }
+        if (user.blocked) {
+            throw new BadRequestException('User already blocked');
+        }
+        await this.userService.blocked(user);
+
+        return;
+    }
+
+    @UserAdminGetGuard()
+    @ApiOperation({
+        summary: "Restore user's account ban",
+        description:
+            'Restore ban user account, this will allow user to login again',
+        tags: ['admin', 'user'],
+    })
+    @UserAdminUpdateGuard()
+    @UserAdminUpdateBlockedGuard()
+    @RequestParamGuard(UserRequestDto)
+    @Post('/unban/:user')
+    async unBan(@Param() userId: string) {
+        const user: UserDoc = await this.userService.findOneById(userId);
+        if (user) {
+            throw new NotFoundException('User not found');
+        }
+        if (!user.blocked) {
+            throw new BadRequestException('User already un-blocked');
+        }
+        await this.userService.unblocked(user);
+
+        return;
     }
 
     @UserAdminGetGuard()

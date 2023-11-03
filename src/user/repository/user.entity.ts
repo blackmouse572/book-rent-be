@@ -99,28 +99,6 @@ export class UserEntity extends DatabaseMongoObjectIdEntityAbstract {
 
     @Prop({
         required: true,
-        default: true,
-        index: true,
-        type: Boolean,
-    })
-    isActive: boolean;
-
-    @Prop({
-        required: true,
-        default: false,
-        index: true,
-        type: Boolean,
-    })
-    inactivePermanent: boolean;
-
-    @Prop({
-        required: false,
-        type: Date,
-    })
-    inactiveDate?: Date;
-
-    @Prop({
-        required: true,
         default: false,
         index: true,
         type: Boolean,
