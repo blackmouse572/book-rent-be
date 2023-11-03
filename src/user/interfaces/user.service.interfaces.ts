@@ -11,22 +11,25 @@ import {
 import { UserCreateDto } from 'src/user/dtos/create-user.dto';
 import { UserUpdateDto } from 'src/user/dtos/update-user.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
-import { UserDoc, UserEntity } from 'src/user/repository/user.entity';
+import { UserDoc } from 'src/user/repository/user.entity';
 
 export interface IUserService {
     findAll(
         find?: Record<string, any>,
         options?: IDatabaseFindAllOptions
     ): Promise<IUserEntity[]>;
-    findOneById<T>(_id: string, options?: IDatabaseFindOneOptions): Promise<T>;
-    findOne<T>(
+    findOneById(
+        _id: string,
+        options?: IDatabaseFindOneOptions
+    ): Promise<UserDoc>;
+    findOne(
         find: Record<string, any>,
         options?: IDatabaseFindOneOptions
-    ): Promise<T>;
-    findOneByUsername<T>(
+    ): Promise<UserDoc>;
+    findOneByUsername(
         username: string,
         options?: IDatabaseFindOneOptions
-    ): Promise<T>;
+    ): Promise<UserDoc>;
     findOneByEmail<T>(
         email: string,
         options?: IDatabaseFindOneOptions
@@ -68,18 +71,6 @@ export interface IUserService {
     updatePassword(
         repository: UserDoc,
         { passwordHash, salt }: IAuthPassword,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc>;
-    active(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserEntity>;
-    inactive(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc>;
-    inactivePermanent(
-        repository: UserDoc,
         options?: IDatabaseSaveOptions
     ): Promise<UserDoc>;
     blocked(

@@ -42,7 +42,7 @@ export class UserService implements IUserService {
         });
     }
 
-    async findOneById<UserDoc>(
+    async findOneById(
         _id: string,
         options?: IDatabaseFindOneOptions
     ): Promise<UserDoc> {
@@ -95,8 +95,6 @@ export class UserService implements IUserService {
         create.password = passwordHash;
         create.fullName = fullName;
         create.phone = phone;
-        create.isActive = true;
-        create.inactivePermanent = false;
         create.blocked = false;
         create.salt = salt;
         create.passwordAttempt = 0;
@@ -184,37 +182,6 @@ export class UserService implements IUserService {
     ): Promise<UserDoc> {
         repository.password = passwordHash;
         repository.salt = salt;
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async active(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserEntity> {
-        repository.isActive = true;
-        repository.inactiveDate = undefined;
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async inactive(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.isActive = false;
-        repository.inactiveDate = this.helperDateService.create();
-
-        return this.userRepository.save(repository, options);
-    }
-
-    async inactivePermanent(
-        repository: UserDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<UserDoc> {
-        repository.isActive = false;
-        repository.inactivePermanent = true;
-        repository.inactiveDate = this.helperDateService.create();
 
         return this.userRepository.save(repository, options);
     }
