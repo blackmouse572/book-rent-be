@@ -34,7 +34,7 @@ export class UserCreateDto {
     readonly fullName: string;
 
     @ApiProperty({
-        example: faker.phone.number('62812#########'),
+        example: faker.phone.number(),
         required: true,
     })
     @IsString()

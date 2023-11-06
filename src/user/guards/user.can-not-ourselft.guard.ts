@@ -1,7 +1,7 @@
 import {
-    Injectable,
     CanActivate,
     ExecutionContext,
+    Injectable,
     NotFoundException,
 } from '@nestjs/common';
 import { IRequestApp } from 'src/common/pagination/interfaces/request.interface';
@@ -13,10 +13,10 @@ export class UserCanNotOurSelfGuard implements CanActivate {
         const { __user, user } = context
             .switchToHttp()
             .getRequest<IRequestApp & { __user: UserDoc }>();
-
-        if (__user._id === user._id) {
+        if (__user._id === user.id) {
             throw new NotFoundException({
                 message: 'User not found',
+                trace: 'UserCanNotOurSelfGuard',
             });
         }
 

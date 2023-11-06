@@ -1,7 +1,7 @@
 import {
-    Injectable,
     CanActivate,
     ExecutionContext,
+    Injectable,
     NotFoundException,
 } from '@nestjs/common';
 import { IRequestApp } from 'src/common/pagination/interfaces/request.interface';
@@ -17,6 +17,7 @@ export class UserNotFoundGuard implements CanActivate {
         if (!__user) {
             throw new NotFoundException({
                 message: 'User not found',
+                trace: 'UserNotFoundGuard',
             });
         }
 

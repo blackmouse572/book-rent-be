@@ -1,14 +1,15 @@
 import {
     BadRequestException,
+    Body,
     Controller,
     Get,
     NotFoundException,
     Param,
     Post,
-    Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthJwtAdminAccessProtected } from 'src/auth/decorators/auth.jwt.decorator';
+import { HelperHashService } from 'src/common/helpers/services/helper.hash.service';
 import {
     PaginationQuery,
     PaginationQueryFilterInBoolean,
@@ -32,8 +33,8 @@ import {
 import {
     UserAdminGetGuard,
     UserAdminUpdateBlockedGuard,
-    UserAdminUpdateGuard,
 } from 'src/user/decorators/user.admin.decorator';
+import AddUserDto from 'src/user/dtos/add-user.dto';
 import { UserRequestDto } from 'src/user/dtos/get-user.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
 import { UserDoc } from 'src/user/repository/user.entity';
@@ -46,18 +47,17 @@ import { UserService } from 'src/user/services/user.service';
 export class UserManageController {
     constructor(
         private readonly paginationService: PaginationService,
+        private readonly hashService: HelperHashService,
         private readonly userService: UserService
     ) {}
 
-    //TODO: IMPLEMENT POLICY HERE
     @ApiOperation({
         tags: ['admin', 'user'],
         description: 'Get list of users in database',
         summary: 'List user',
     })
-    @UserAdminUpdateGuard()
     @AuthJwtAdminAccessProtected()
-    @Get('/list')
+    @Get('/')
     async list(
         @PaginationQuery(
             USER_DEFAULT_PER_PAGE,
@@ -107,6 +107,21 @@ export class UserManageController {
         };
     }
 
+    @ApiOperation({
+        tags: ['admin', 'user'],
+        description: 'Add new user into database',
+        summary: 'Add a new user',
+    })
+    @AuthJwtAdminAccessProtected()
+    @Post('/')
+    async addUser(@Body() dto: AddUserDto) {
+        const { password } = dto;
+        const salt = this.hashService.randomSalt(10);
+        const passwordHash = this.hashService.bcrypt(password, salt);
+        const user = await this.userService.create(dto, { passwordHash, salt });
+        return user;
+    }
+
     @UserAdminGetGuard()
     @RequestParamGuard(UserRequestDto)
     @AuthJwtAdminAccessProtected()
@@ -116,18 +131,19 @@ export class UserManageController {
         return user;
     }
 
-    @UserAdminUpdateGuard()
-    @UserAdminUpdateBlockedGuard()
     @ApiOperation({
         summary: "Ban user's account",
         description: 'Ban user account, this will prevent user from login',
         tags: ['admin', 'user'],
     })
+    @UserAdminUpdateBlockedGuard()
+    @AuthJwtAdminAccessProtected()
     @RequestParamGuard(UserRequestDto)
     @Post('/ban/:user')
-    async banUser(@Param() userId: string) {
+    async banUser(@Param('user') userId: string) {
         const user: UserDoc = await this.userService.findOneById(userId);
-        if (user) {
+
+        if (!user) {
             throw new NotFoundException('User not found');
         }
         if (user.blocked) {
@@ -135,23 +151,26 @@ export class UserManageController {
         }
         await this.userService.blocked(user);
 
-        return;
+        return {
+            message: 'User blocked',
+            isSuccess: true,
+            data: user.toObject(),
+        };
     }
 
-    @UserAdminGetGuard()
     @ApiOperation({
         summary: "Restore user's account ban",
         description:
             'Restore ban user account, this will allow user to login again',
         tags: ['admin', 'user'],
     })
-    @UserAdminUpdateGuard()
     @UserAdminUpdateBlockedGuard()
+    @AuthJwtAdminAccessProtected()
     @RequestParamGuard(UserRequestDto)
     @Post('/unban/:user')
     async unBan(@Param() userId: string) {
         const user: UserDoc = await this.userService.findOneById(userId);
-        if (user) {
+        if (!user) {
             throw new NotFoundException('User not found');
         }
         if (!user.blocked) {
@@ -159,20 +178,10 @@ export class UserManageController {
         }
         await this.userService.unblocked(user);
 
-        return;
-    }
-
-    @UserAdminGetGuard()
-    @RequestParamGuard(UserRequestDto)
-    @AuthJwtAdminAccessProtected()
-    @Get('/seed')
-    async seed(@Query('amount') amount: number = 30) {
-        const users = Array.from(Array(amount).keys()).map((index: number) => {
-            return {
-                email: ` ${index} ${new Date().getTime()}@gmail.com`,
-                password: '123456',
-            };
-        });
-        return users;
+        return {
+            message: 'User un-blocked',
+            isSuccess: true,
+            data: user.toObject(),
+        };
     }
 }
