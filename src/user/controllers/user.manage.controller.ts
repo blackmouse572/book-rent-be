@@ -1,14 +1,15 @@
 import {
     BadRequestException,
+    Body,
     Controller,
     Get,
     NotFoundException,
     Param,
     Post,
-    Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthJwtAdminAccessProtected } from 'src/auth/decorators/auth.jwt.decorator';
+import { HelperHashService } from 'src/common/helpers/services/helper.hash.service';
 import {
     PaginationQuery,
     PaginationQueryFilterInBoolean,
@@ -33,6 +34,7 @@ import {
     UserAdminGetGuard,
     UserAdminUpdateBlockedGuard,
 } from 'src/user/decorators/user.admin.decorator';
+import AddUserDto from 'src/user/dtos/add-user.dto';
 import { UserRequestDto } from 'src/user/dtos/get-user.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
 import { UserDoc } from 'src/user/repository/user.entity';
@@ -45,6 +47,7 @@ import { UserService } from 'src/user/services/user.service';
 export class UserManageController {
     constructor(
         private readonly paginationService: PaginationService,
+        private readonly hashService: HelperHashService,
         private readonly userService: UserService
     ) {}
 
@@ -102,6 +105,21 @@ export class UserManageController {
             _pagination: { total, totalPage },
             data: users,
         };
+    }
+
+    @ApiOperation({
+        tags: ['admin', 'user'],
+        description: 'Add new user into database',
+        summary: 'Add a new user',
+    })
+    @AuthJwtAdminAccessProtected()
+    @Post('/')
+    async addUser(@Body() dto: AddUserDto) {
+        const { password } = dto;
+        const salt = this.hashService.randomSalt(10);
+        const passwordHash = this.hashService.bcrypt(password, salt);
+        const user = await this.userService.create(dto, { passwordHash, salt });
+        return user;
     }
 
     @UserAdminGetGuard()
@@ -165,19 +183,5 @@ export class UserManageController {
             isSuccess: true,
             data: user.toObject(),
         };
-    }
-
-    @UserAdminGetGuard()
-    @RequestParamGuard(UserRequestDto)
-    @AuthJwtAdminAccessProtected()
-    @Get('/seed')
-    async seed(@Query('amount') amount: number = 30) {
-        const users = Array.from(Array(amount).keys()).map((index: number) => {
-            return {
-                email: ` ${index} ${new Date().getTime()}@gmail.com`,
-                password: '123456',
-            };
-        });
-        return users;
     }
 }

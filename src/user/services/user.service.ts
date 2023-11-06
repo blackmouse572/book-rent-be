@@ -11,6 +11,7 @@ import {
     IDatabaseSaveOptions,
 } from 'src/common/database/interfaces/database.interface';
 import { HelperDateService } from 'src/common/helpers/services/helper.date.service';
+import AddUserDto from 'src/user/dtos/add-user.dto';
 import { UserCreateDto } from 'src/user/dtos/create-user.dto';
 import { UserUpdateDto } from 'src/user/dtos/update-user.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
@@ -96,6 +97,34 @@ export class UserService implements IUserService {
         create.fullName = fullName;
         create.phone = phone;
         create.blocked = false;
+        create.salt = salt;
+        create.passwordAttempt = 0;
+
+        return this.userRepository.create<UserEntity>(create, options);
+    }
+
+    async add(
+        {
+            email,
+            fullName,
+            phone,
+            username,
+            role,
+            address,
+            blocked = false,
+        }: AddUserDto,
+        { passwordHash, salt }: IAuthPassword,
+        options?: IDatabaseCreateOptions
+    ): Promise<UserDoc> {
+        const create: UserEntity = new UserEntity();
+        create.email = email;
+        create.username = username;
+        create.password = passwordHash;
+        create.fullName = fullName;
+        create.phone = phone;
+        create.role = role;
+        create.address = address;
+        create.blocked = blocked;
         create.salt = salt;
         create.passwordAttempt = 0;
 
