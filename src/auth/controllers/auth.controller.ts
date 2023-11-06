@@ -33,7 +33,7 @@ import { UserDoc } from 'src/user/repository/user.entity';
 import { UserService } from 'src/user/services/user.service';
 
 @ApiTags('modules.common.auth')
-@Controller('auth')
+@Controller('/auth')
 export class AuthController {
     maxPasswordAttemp: number;
     constructor(
@@ -48,7 +48,7 @@ export class AuthController {
         tags: ['auth'],
         description: 'Login with local credentials',
     })
-    @Post('login')
+    @Post('/login')
     async login(
         @Body() { password, usernameOrEmail }: UserLoginDto,
         @Res({ passthrough: true }) res: Response

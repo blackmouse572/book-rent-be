@@ -32,7 +32,6 @@ import {
 import {
     UserAdminGetGuard,
     UserAdminUpdateBlockedGuard,
-    UserAdminUpdateGuard,
 } from 'src/user/decorators/user.admin.decorator';
 import { UserRequestDto } from 'src/user/dtos/get-user.dto';
 import { IUserEntity } from 'src/user/interfaces/user.interface';
@@ -49,15 +48,13 @@ export class UserManageController {
         private readonly userService: UserService
     ) {}
 
-    //TODO: IMPLEMENT POLICY HERE
     @ApiOperation({
         tags: ['admin', 'user'],
         description: 'Get list of users in database',
         summary: 'List user',
     })
-    @UserAdminUpdateGuard()
     @AuthJwtAdminAccessProtected()
-    @Get('/list')
+    @Get('/')
     async list(
         @PaginationQuery(
             USER_DEFAULT_PER_PAGE,
@@ -116,18 +113,19 @@ export class UserManageController {
         return user;
     }
 
-    @UserAdminUpdateGuard()
-    @UserAdminUpdateBlockedGuard()
     @ApiOperation({
         summary: "Ban user's account",
         description: 'Ban user account, this will prevent user from login',
         tags: ['admin', 'user'],
     })
+    @UserAdminUpdateBlockedGuard()
+    @AuthJwtAdminAccessProtected()
     @RequestParamGuard(UserRequestDto)
     @Post('/ban/:user')
-    async banUser(@Param() userId: string) {
+    async banUser(@Param('user') userId: string) {
         const user: UserDoc = await this.userService.findOneById(userId);
-        if (user) {
+
+        if (!user) {
             throw new NotFoundException('User not found');
         }
         if (user.blocked) {
@@ -135,23 +133,26 @@ export class UserManageController {
         }
         await this.userService.blocked(user);
 
-        return;
+        return {
+            message: 'User blocked',
+            isSuccess: true,
+            data: user.toObject(),
+        };
     }
 
-    @UserAdminGetGuard()
     @ApiOperation({
         summary: "Restore user's account ban",
         description:
             'Restore ban user account, this will allow user to login again',
         tags: ['admin', 'user'],
     })
-    @UserAdminUpdateGuard()
     @UserAdminUpdateBlockedGuard()
+    @AuthJwtAdminAccessProtected()
     @RequestParamGuard(UserRequestDto)
     @Post('/unban/:user')
     async unBan(@Param() userId: string) {
         const user: UserDoc = await this.userService.findOneById(userId);
-        if (user) {
+        if (!user) {
             throw new NotFoundException('User not found');
         }
         if (!user.blocked) {
@@ -159,7 +160,11 @@ export class UserManageController {
         }
         await this.userService.unblocked(user);
 
-        return;
+        return {
+            message: 'User un-blocked',
+            isSuccess: true,
+            data: user.toObject(),
+        };
     }
 
     @UserAdminGetGuard()
