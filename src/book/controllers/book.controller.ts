@@ -31,6 +31,7 @@ import { CategoryDoc } from 'src/category/repository/category.entity';
 import { CategoryService } from 'src/category/services/category.service';
 import {
     PaginationQuery,
+    PaginationQueryFilterContain,
     PaginationQueryFilterEqual,
     PaginationQueryFilterEqualObjectId,
     PaginationQueryFilterInEnum,
@@ -82,7 +83,7 @@ export class BookController {
         description: 'Get list of books in database',
         summary: 'List book',
     })
-    @Get('/list')
+    @Get('/')
     async list(
         @PaginationQuery(
             BOOK_DEFAULT_PER_PAGE,
@@ -100,6 +101,7 @@ export class BookController {
         status: Record<string, any>,
         @PaginationQueryFilterEqualObjectId('category')
         category: Record<string, any>,
+        @PaginationQueryFilterContain('author') author: Record<string, any>,
         @PaginationQueryFilterEqual('genres') genres: Record<string, any>
     ) {
         const find: Record<string, any> = {
@@ -107,6 +109,7 @@ export class BookController {
             ...status,
             ...category,
             ...genres,
+            ...author,
         };
 
         const books: BookEntity[] = await this.bookService.findAll(find, {
@@ -140,15 +143,6 @@ export class BookController {
             throw new NotFoundException({ message: 'book not found' });
         }
         return result.populate('category');
-    }
-
-    @ApiOperation({
-        tags: ['book'],
-        description: 'get all book',
-    })
-    @Get()
-    findAll(): Promise<BookEntity[]> {
-        return this.bookService.findAll();
     }
 
     @ApiOperation({
