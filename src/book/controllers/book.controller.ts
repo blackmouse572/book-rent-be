@@ -33,7 +33,6 @@ import {
     PaginationQuery,
     PaginationQueryFilterContain,
     PaginationQueryFilterEqual,
-    PaginationQueryFilterEqualObjectId,
     PaginationQueryFilterInEnum,
 } from 'src/common/pagination/decorators/pagination.decorator';
 import { PaginationListDto } from 'src/common/pagination/dto/pagination.list.dto';
@@ -99,17 +98,18 @@ export class BookController {
             BOOK_STATUS_ENUM
         )
         status: Record<string, any>,
-        @PaginationQueryFilterEqualObjectId('category')
-        category: Record<string, any>,
         @PaginationQueryFilterContain('author') author: Record<string, any>,
-        @PaginationQueryFilterEqual('genres') genres: Record<string, any>
+        @PaginationQueryFilterEqual('genres') genres: Record<string, any>,
+        @PaginationQueryFilterContain('category.name')
+        category: Record<string, any>
     ) {
+        console.log(category);
         const find: Record<string, any> = {
             ..._search,
             ...status,
-            ...category,
             ...genres,
             ...author,
+            ...category,
         };
 
         const books: BookEntity[] = await this.bookService.findAll(find, {
