@@ -109,17 +109,27 @@ export class BookController {
             ...status,
             ...genres,
             ...author,
-            ...category,
         };
 
-        const books: BookEntity[] = await this.bookService.findAll(find, {
-            paging: {
-                limit: _limit,
-                offset: _offset,
-            },
-            order: _order,
-            join: { path: 'category' },
-        });
+        const books: BookEntity[] = await this.bookService
+            .findAll(find, {
+                paging: {
+                    limit: _limit,
+                    offset: _offset,
+                },
+                order: _order,
+                join: { path: 'category' },
+            })
+            .then((books) => {
+                const regx = Object.values(category)[0]['$regex'];
+                return books.filter((book) => {
+                    const result = book.category.filter((cate) => {
+                        return cate.name.match(regx);
+                    });
+                    if (result.length > 0) return book;
+                    return null;
+                });
+            });
 
         const total: number = await this.bookService.getTotal(find);
         const totalPage: number = this.paginationService.totalPage(
