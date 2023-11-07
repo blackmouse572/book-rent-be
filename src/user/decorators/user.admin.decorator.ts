@@ -4,6 +4,7 @@ import { UserBlockedGuard } from 'src/user/guards/user.blocked.guard';
 import { UserCanNotOurSelfGuard } from 'src/user/guards/user.can-not-ourselft.guard';
 import { UserNotFoundGuard } from 'src/user/guards/user.notfound.guard';
 import { UserPutToRequestGuard } from 'src/user/guards/user.put-to-request.guard';
+import { UserNotBlockedGuard } from 'src/user/guards/user.unblocked.guard';
 
 export function UserAdminGetGuard(): MethodDecorator {
     return applyDecorators(UseGuards(UserPutToRequestGuard, UserNotFoundGuard));
@@ -38,5 +39,17 @@ export function UserAdminUpdateBlockedGuard(): MethodDecorator {
             UserBlockedGuard
         ),
         SetMetadata(USER_BLOCKED_META_KEY, [false])
+    );
+}
+
+export function UserAdminUpdateUnBlockGuard(): MethodDecorator {
+    return applyDecorators(
+        UseGuards(
+            UserPutToRequestGuard,
+            UserNotFoundGuard,
+            UserNotBlockedGuard,
+            UserCanNotOurSelfGuard
+        ),
+        SetMetadata(USER_BLOCKED_META_KEY, [true])
     );
 }

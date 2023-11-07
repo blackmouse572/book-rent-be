@@ -33,6 +33,7 @@ import {
 import {
     UserAdminGetGuard,
     UserAdminUpdateBlockedGuard,
+    UserAdminUpdateUnBlockGuard,
 } from 'src/user/decorators/user.admin.decorator';
 import AddUserDto from 'src/user/dtos/add-user.dto';
 import { UserRequestDto } from 'src/user/dtos/get-user.dto';
@@ -164,11 +165,11 @@ export class UserManageController {
             'Restore ban user account, this will allow user to login again',
         tags: ['admin', 'user'],
     })
-    @UserAdminUpdateBlockedGuard()
+    @UserAdminUpdateUnBlockGuard()
     @AuthJwtAdminAccessProtected()
     @RequestParamGuard(UserRequestDto)
     @Post('/unban/:user')
-    async unBan(@Param() userId: string) {
+    async unBan(@Param('user') userId: string) {
         const user: UserDoc = await this.userService.findOneById(userId);
         if (!user) {
             throw new NotFoundException('User not found');

@@ -10,7 +10,7 @@ import { USER_BLOCKED_META_KEY } from 'src/user/constants/user.constants';
 import { UserDoc } from 'src/user/repository/user.entity';
 
 @Injectable()
-export class UserBlockedGuard implements CanActivate {
+export class UserNotBlockedGuard implements CanActivate {
     constructor(private reflector: Reflector) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -19,21 +19,18 @@ export class UserBlockedGuard implements CanActivate {
             [context.getHandler(), context.getClass()]
         );
 
-        if (!required) {
+        if (required) {
             return true;
         }
 
-        const { __user, user } = context
+        const { __user } = context
             .switchToHttp()
             .getRequest<IRequestApp & { __user: UserDoc }>();
 
-        // TODO: delete this line
-        console.log(user);
-
-        if (!required.includes(__user.blocked)) {
+        if (required.includes(__user.blocked)) {
             throw new BadRequestException({
-                message: 'User is blocked',
-                trace: 'UserBlockedGuard',
+                message: 'User is not blocked',
+                trace: 'UserNotBlockedGuard',
             });
         }
         return true;
