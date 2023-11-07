@@ -132,7 +132,7 @@ export class BookController {
         if (!result) {
             throw new NotFoundException({ message: 'book not found' });
         }
-        return result.populate('category');
+        return result.populate(['category', 'reviews']);
     }
 
     @ApiOperation({
