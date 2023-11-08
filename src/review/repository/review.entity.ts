@@ -21,7 +21,7 @@ export class ReviewEntity extends DatabaseMongoObjectIdEntityAbstract {
 
     @Prop({
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'UserEntity',
+        ref: UserEntity.name,
     })
     author: UserEntity;
 

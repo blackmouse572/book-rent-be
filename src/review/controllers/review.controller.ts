@@ -10,7 +10,9 @@ import {
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AuthJwtAccessProtected } from 'src/auth/decorators/auth.jwt.decorator';
 import { BookService } from 'src/book/services/book.service';
+import { RequestParamGuard } from 'src/lib/guards/request.decorator';
 import { ReviewCreateDto } from 'src/review/dtos/create-review.dto';
+import { ReviewRequestDto } from 'src/review/dtos/review-request.dto';
 import { ReviewDoc } from 'src/review/repository/review.entity';
 import { ReviewService } from 'src/review/services/review.service';
 import { ENUM_ROLE_TYPE } from 'src/user/constants/user.enum.constants';
@@ -31,6 +33,7 @@ export class ReviewController {
     })
     @UserProtected()
     @AuthJwtAccessProtected()
+    @RequestParamGuard(ReviewRequestDto)
     @Post('/:bookId')
     async create(
         @GetUser() user: UserDoc,
