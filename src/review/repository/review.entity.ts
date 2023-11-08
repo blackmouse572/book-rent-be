@@ -1,11 +1,11 @@
 import { Prop, SchemaFactory } from '@nestjs/mongoose';
-import {
+import mongoose, {
     CallbackWithoutResultAndOptionalError,
     HydratedDocument,
 } from 'mongoose';
 import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
-import { UserEntity, UserSchema } from 'src/user/repository/user.entity';
+import { UserEntity } from 'src/user/repository/user.entity';
 
 export const ReviewDatabaseName = 'reviews';
 
@@ -20,8 +20,8 @@ export class ReviewEntity extends DatabaseMongoObjectIdEntityAbstract {
     comment?: string;
 
     @Prop({
-        required: true,
-        type: UserSchema,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: UserEntity.name,
     })
     author: UserEntity;
 

@@ -12,6 +12,7 @@ import { PaginationModule } from 'src/common/pagination/pagination.module';
 import configs from 'src/configs';
 import { AppLoggerMiddleware } from 'src/lib/logger.middleware';
 import { ENUM_APP_ENVIROMENT } from 'src/lib/swagger.constraint';
+import { ReviewModule } from 'src/review/review.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { HelpersModule } from './common/helpers/helpers.module';
@@ -114,6 +115,7 @@ import { UserModule } from './user/user.module';
         OrderModule,
         TransactionModule,
         CategoryModule, // Integration of the CategoryModule
+        ReviewModule,
     ],
     controllers: [AppController],
     providers: [AppService],

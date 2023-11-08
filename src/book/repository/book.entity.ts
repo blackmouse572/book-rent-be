@@ -60,7 +60,7 @@ export class BookEntity extends DatabaseMongoObjectIdEntityAbstract {
     status: BOOK_STATUS_ENUM;
 
     @Prop({
-        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'reviews' }],
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ReviewEntity' }],
     })
     reviews: ReviewEntity[];
 
