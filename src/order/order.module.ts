@@ -19,7 +19,7 @@ import { OrderService } from 'src/order/services/order.service';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-    controllers: [OrderController, OrderManageController],
+    controllers: [OrderManageController, OrderController],
     providers: [
         OrderService,
         OrderRepository,

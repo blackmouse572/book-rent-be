@@ -44,7 +44,7 @@ import { OrderService } from 'src/order/services/order.service';
 
 @ApiTags('modules.admin.orders')
 @Controller({
-    path: '/order',
+    path: '/orders',
 })
 @ApiBearerAuth('accessToken')
 export class OrderManageController {
@@ -53,74 +53,12 @@ export class OrderManageController {
         private readonly paginationService: PaginationService
     ) {}
 
-    @Put(':id')
-    @AuthJwtAdminAccessProtected()
-    @RequestParamGuard(OrderRequestDto)
-    @ApiOperation({
-        tags: ['admin', 'order'],
-        description:
-            'Update order details, including payment, location, date,\n Cannot change cart details',
-
-        summary: 'Update order basic details',
-    })
-    async updateOrderDetails(
-        @Param('id') id: string,
-        @Body() orderRequestDto: UpdateOrderBasicDto
-    ) {
-        const order = await this.orderService.findOneById(id);
-        if (!order) {
-            throw new NotFoundException('Order not found');
-        }
-
-        const {
-            pickupLocation,
-            rentalDate,
-            returnDate,
-            returnLocation,
-            depositType,
-        } = orderRequestDto;
-
-        if (!this.validateUpdateOrderDetails(orderRequestDto, order)) {
-            return;
-        }
-
-        rentalDate && (order.rentalDate = rentalDate);
-        returnDate && (order.returnDate = returnDate);
-        pickupLocation && (order.pickupLocation = pickupLocation);
-        returnLocation && (order.returnLocation = returnLocation);
-        depositType && (order.depositType = depositType);
-
-        return order.save();
-    }
-
-    @Put(':id/:status')
-    @AuthJwtAdminAccessProtected()
-    @RequestParamGuard(OrderUpdateStatusRequestDto)
-    @ApiOperation({
-        tags: ['admin', 'order'],
-        description: 'Update order status',
-        summary: 'Update order status',
-    })
-    async updateOrderStatus(
-        @Param('id') id: string,
-        @Param('status') status: ENUM_ORDER_STATUS
-    ) {
-        const order = await this.orderService.findOneById(id);
-        if (!order) {
-            throw new NotFoundException('Order not found');
-        }
-
-        order.status = status;
-
-        return order.save();
-    }
-
     @ApiOperation({
         summary: 'Get all orders',
         description: 'Get all orders',
     })
     @AuthJwtAdminAccessProtected()
-    @Get()
+    @Get('/list')
     async getAllOrders(
         @PaginationQuery(
             ORDER_DEFAULT_PERPAGE,
@@ -186,6 +124,67 @@ export class OrderManageController {
         };
     }
 
+    @Put('/detail/:id')
+    @AuthJwtAdminAccessProtected()
+    @RequestParamGuard(OrderRequestDto)
+    @ApiOperation({
+        tags: ['admin', 'order'],
+        description:
+            'Update order details, including payment, location, date,\n Cannot change cart details',
+
+        summary: 'Update order basic details',
+    })
+    async updateOrderDetails(
+        @Param('id') id: string,
+        @Body() orderRequestDto: UpdateOrderBasicDto
+    ) {
+        const order = await this.orderService.findOneById(id);
+        if (!order) {
+            throw new NotFoundException('Order not found');
+        }
+
+        const {
+            pickupLocation,
+            rentalDate,
+            returnDate,
+            returnLocation,
+            depositType,
+        } = orderRequestDto;
+
+        if (!this.validateUpdateOrderDetails(orderRequestDto, order)) {
+            return;
+        }
+
+        rentalDate && (order.rentalDate = rentalDate);
+        returnDate && (order.returnDate = returnDate);
+        pickupLocation && (order.pickupLocation = pickupLocation);
+        returnLocation && (order.returnLocation = returnLocation);
+        depositType && (order.depositType = depositType);
+
+        return order.save();
+    }
+
+    @Put(':id/:status')
+    @AuthJwtAdminAccessProtected()
+    @RequestParamGuard(OrderUpdateStatusRequestDto)
+    @ApiOperation({
+        tags: ['admin', 'order'],
+        description: 'Update order status',
+        summary: 'Update order status',
+    })
+    async updateOrderStatus(
+        @Param('id') id: string,
+        @Param('status') status: ENUM_ORDER_STATUS
+    ) {
+        const order = await this.orderService.findOneById(id);
+        if (!order) {
+            throw new NotFoundException('Order not found');
+        }
+
+        order.status = status;
+
+        return order.save();
+    }
     @ApiOperation({
         summary: 'Get order details by id',
         description: 'Query order details by id',
