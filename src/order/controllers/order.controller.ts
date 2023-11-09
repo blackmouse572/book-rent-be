@@ -45,7 +45,7 @@ import { OrderService } from 'src/order/services/order.service';
 
 @ApiBearerAuth('accessToken')
 @ApiTags('modules.authenticated.order')
-@Controller('order')
+@Controller('/order')
 export class OrderController {
     constructor(
         private readonly orderService: OrderService,
