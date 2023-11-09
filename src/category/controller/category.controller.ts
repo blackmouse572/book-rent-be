@@ -6,7 +6,9 @@ import {
     Param,
     Post,
     Put,
+    Query,
 } from '@nestjs/common';
+import { CATEGORY_STATUS_ENUM } from 'src/category/constants/category.enum.constants';
 import { ApiOperation } from '@nestjs/swagger';
 import { AuthJwtAdminAccessProtected } from 'src/auth/decorators/auth.jwt.decorator';
 import { CategoryCreateDto } from 'src/category/dtos/create-category.dto';
@@ -62,14 +64,11 @@ export class CategoryController {
     }
 
     @ApiOperation({
-        tags: ['admin', 'user'],
-        description: 'Handle both list and update category by Id',
+        tags: ['category'],
+        description: 'Get a list of all categories with pagination',
     })
-    @Put('/:id')
     @Get('/list')
-    async handleBothListAndUpdate(
-        @Param('id') id?: string,
-        @Body() updateCategoryDto?: CategoryUpdateDto,
+    async listCategories(
         @PaginationQuery(
             CATEGORY_PAGINATION_DEFAULT_LIMIT,
             CATEGORY_PAGINATION_DEFAULT_SORT_FIELD,
@@ -77,32 +76,41 @@ export class CategoryController {
             undefined,
             CATEGORY_PAGINATION_ALLOWED_SORT_FIELDS
         )
-        paginationDto?: PaginationListDto
-    ): Promise<CategoryDoc | any> {
-        if (id && updateCategoryDto) {
-            return this.categoryService.update(id, updateCategoryDto);
-        } else {
-            const { _limit, _order, _offset } = paginationDto;
-            const find: Record<string, any> = {
-                ...paginationDto._search,
-            };
-            const categories = await this.categoryService.findAll(find, {
-                paging: {
-                    limit: _limit,
-                    offset: _offset,
-                },
-                order: _order,
-            });
-            const total: number = await this.categoryService.getTotal(find);
-            const totalPage: number = this.paginationService.totalPage(
-                total,
-                _limit
-            );
+        paginationDto: PaginationListDto,
+        @Query('status') status?: CATEGORY_STATUS_ENUM
+    ): Promise<{ _pagination: any; data: CategoryEntity[] }> {
+        const { _limit, _order, _offset, _search } = paginationDto;
+        const find: Record<string, any> = {
+            ..._search,
+            ...(status ? { status } : {}),
+        };
 
-            return {
-                _pagination: { total, totalPage },
-                data: categories,
-            };
-        }
+        const categories = await this.categoryService.findAll(find, {
+            paging: {
+                limit: _limit,
+                offset: _offset,
+            },
+            order: _order,
+        });
+
+        const total: number = await this.categoryService.getTotal(find);
+        const totalPage: number = this.paginationService.totalPage(
+            total,
+            _limit
+        );
+
+        return {
+            _pagination: { total, totalPage },
+            data: categories,
+        };
+    }
+    @ApiOperation({ summary: 'Update the status of a category' })
+    @AuthJwtAdminAccessProtected()
+    @Put('status/:id')
+    async updateStatus(
+        @Param('id') id: string,
+        @Body() updateStatusDto: { status: CATEGORY_STATUS_ENUM }
+    ): Promise<CategoryDoc> {
+        return this.categoryService.updateStatus(id, updateStatusDto.status);
     }
 }
