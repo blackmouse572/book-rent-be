@@ -139,7 +139,16 @@ export class BookController {
         if (!result) {
             throw new NotFoundException({ message: 'book not found' });
         }
-        return result.populate(['category', 'reviews']);
+        return result.populate([
+            'category',
+            {
+                path: 'reviews',
+                populate: {
+                    path: 'author',
+                    select: 'id username fullName email avatar',
+                },
+            },
+        ]);
     }
 
     @ApiOperation({
