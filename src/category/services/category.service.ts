@@ -17,6 +17,8 @@ import {
 export class CategoryService {
     constructor(private readonly categoryRepository: CategoryRepository) {}
 
+   
+
     async findOneById(
         _id: string,
         options?: IDatabaseFindOneOptions
@@ -24,15 +26,41 @@ export class CategoryService {
         return this.categoryRepository.findOneById<CategoryDoc>(_id, options);
     }
 
+    async enable(_id: string): Promise<CategoryDoc> {
+        const category = await this.findOneById(_id);
+        if (!category) {
+            throw new NotFoundException('Category not found');
+        }
+        category.status = CATEGORY_STATUS_ENUM.ENABLE;
+        return this.categoryRepository.save(category);
+    }
+
+    async disable(_id: string): Promise<CategoryDoc> {
+        const category = await this.findOneById(_id);
+        if (!category) {
+            throw new NotFoundException('Category not found');
+        }
+        category.status = CATEGORY_STATUS_ENUM.DISABLE;
+        return this.categoryRepository.save(category);
+    }
+
+    async changeStatus(_id: string): Promise<CategoryDoc> {
+        const category = await this.findOneById(_id);
+        if (!category) {
+            throw new NotFoundException('Category not found');
+        }
+        category.status = category.status === CATEGORY_STATUS_ENUM.ENABLE ? CATEGORY_STATUS_ENUM.DISABLE : CATEGORY_STATUS_ENUM.ENABLE;
+        return this.categoryRepository.save(category);
+    }
+
     async create(
         categoryCreateDto: CategoryCreateDto,
         options?: IDatabaseCreateOptions<any>
     ): Promise<CategoryDoc> {
-        const entity: CategoryEntity = new CategoryEntity();
+        const entity = new CategoryEntity();
         entity.name = categoryCreateDto.name;
         entity.description = categoryCreateDto.description;
         entity.status = CATEGORY_STATUS_ENUM.ENABLE;
-
         return this.categoryRepository.create<CategoryEntity>(entity, options);
     }
 
@@ -42,18 +70,13 @@ export class CategoryService {
     ): Promise<CategoryDoc> {
         const category = await this.findOneById(_id);
         if (!category) {
-            throw new NotFoundException({ message: 'Category not found' });
+            throw new NotFoundException('Category not found');
         }
-        if (categoryUpdateDto.name) {
-            category.name = categoryUpdateDto.name;
-        }
-        if (categoryUpdateDto.description) {
-            category.description = categoryUpdateDto.description;
-        }
-        if (categoryUpdateDto.status) {
-            category.status = categoryUpdateDto.status;
-        }
-        return this.categoryRepository.save(category); // Removed options for simplicity
+        category.name = categoryUpdateDto.name ?? category.name;
+        category.description =
+            categoryUpdateDto.description ?? category.description;
+        category.status = categoryUpdateDto.status ?? category.status;
+        return this.categoryRepository.save(category);
     }
 
     async findAll(
@@ -65,5 +88,13 @@ export class CategoryService {
 
     async getTotal(find: Record<string, any> = {}): Promise<number> {
         return this.categoryRepository.count(find);
+    }
+    async updateStatus(_id: string, newStatus: CATEGORY_STATUS_ENUM): Promise<CategoryDoc> {
+        const category = await this.findOneById(_id);
+        if (!category) {
+            throw new NotFoundException('Category not found');
+        }
+        category.status = newStatus;
+        return this.categoryRepository.save(category);
     }
 }
