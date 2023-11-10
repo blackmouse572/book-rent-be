@@ -3,6 +3,7 @@ import {
     Body,
     Controller,
     Delete,
+    ForbiddenException,
     Get,
     NotFoundException,
     Param,
@@ -138,6 +139,9 @@ export class BookController {
         const result = await this.bookService.findOneById(_id);
         if (!result) {
             throw new NotFoundException({ message: 'book not found' });
+        }
+        if (result.status === BOOK_STATUS_ENUM.DISABLE){
+            throw new ForbiddenException({message: 'Book is disabled'})
         }
         return result.populate([
             'category',
