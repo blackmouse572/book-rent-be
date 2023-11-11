@@ -23,7 +23,6 @@ export class TransactionEntity extends DatabaseMongoObjectIdEntityAbstract {
         type: mongoose.Schema.Types.ObjectId,
         ref: OrderEntity.name,
         required: true,
-        unique: true,
     })
     order: OrderEntity;
 

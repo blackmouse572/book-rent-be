@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Get,
@@ -63,6 +64,13 @@ export class TransactionController {
             throw new NotFoundException({
                 message: `Can not find order with id: ${dto.orderId}`,
             });
+        }
+
+        const transaction = await this.transactionService.findOne({
+            order: order,
+        });
+        if (transaction) {
+            throw new BadRequestException('Order was already paid');
         }
 
         const entity = new TransactionEntity();
