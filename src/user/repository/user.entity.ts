@@ -3,6 +3,7 @@ import {
     CallbackWithoutResultAndOptionalError,
     HydratedDocument,
 } from 'mongoose';
+import { ENUM_CITIZEN_ID_TYPE } from 'src/auth/constants/auth.enum.constant';
 import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
 import { ENUM_ROLE_TYPE } from 'src/user/constants/user.enum.constants';
@@ -22,6 +23,43 @@ export class UserEntity extends DatabaseMongoObjectIdEntityAbstract {
         maxlength: 100,
     })
     username: string;
+
+    @Prop({
+        required: true,
+        sparse: true,
+        index: true,
+        trim: true,
+        type: String,
+        unique: true,
+        lowercase: true,
+    })
+    citizenId: string;
+
+    @Prop({
+        required: true,
+        default: ENUM_CITIZEN_ID_TYPE.NEW,
+        enum: ENUM_CITIZEN_ID_TYPE,
+        type: String,
+    })
+    citizenIdType: ENUM_CITIZEN_ID_TYPE;
+
+    @Prop({
+        required: true,
+        type: Date,
+    })
+    citizenIdIssueDate: Date;
+
+    @Prop({
+        required: true,
+        type: Date,
+    })
+    citizenIdDateOfBirth: Date;
+
+    @Prop({
+        required: true,
+        type: String,
+    })
+    citizenIdPlaceOfIssue: string;
 
     @Prop({
         required: false,
