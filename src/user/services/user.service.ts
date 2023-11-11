@@ -86,7 +86,7 @@ export class UserService implements IUserService {
     }
 
     async create(
-        { email, fullName, phone, username }: UserCreateDto,
+        { email, fullName, phone, username, ...rest }: UserCreateDto,
         { passwordHash, salt }: IAuthPassword,
         options?: IDatabaseCreateOptions
     ): Promise<UserDoc> {
@@ -100,7 +100,13 @@ export class UserService implements IUserService {
         create.salt = salt;
         create.passwordAttempt = 0;
 
-        return this.userRepository.create<UserEntity>(create, options);
+        return this.userRepository.create<UserEntity>(
+            {
+                ...rest,
+                ...create,
+            },
+            options
+        );
     }
 
     async add(

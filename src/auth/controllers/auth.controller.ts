@@ -174,6 +174,7 @@ export class AuthController {
         }
 
         const password = await this.authService.createPassword(body.password);
+        console.log({ body });
 
         await this.userService.create(
             {
