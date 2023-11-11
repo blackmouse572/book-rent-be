@@ -23,8 +23,6 @@ import {
     USER_DEFAULT_AVAILABLE_ORDER_BY,
     USER_DEFAULT_AVAILABLE_SEARCH,
     USER_DEFAULT_BLOCKED,
-    USER_DEFAULT_INACTIVE_PERMANENT,
-    USER_DEFAULT_IS_ACTIVE,
     USER_DEFAULT_ORDER_BY,
     USER_DEFAULT_ORDER_DIRECTION,
     USER_DEFAULT_PER_PAGE,
@@ -68,23 +66,14 @@ export class UserManageController {
             USER_DEFAULT_AVAILABLE_ORDER_BY
         )
         { _search, _limit, _offset, _order }: PaginationListDto,
-        @PaginationQueryFilterInBoolean('isActive', USER_DEFAULT_IS_ACTIVE)
-        isActive: Record<string, any>,
         @PaginationQueryFilterInBoolean('blocked', USER_DEFAULT_BLOCKED)
         blocked: Record<string, any>,
-        @PaginationQueryFilterInBoolean(
-            'inactivePermanent',
-            USER_DEFAULT_INACTIVE_PERMANENT
-        )
-        inactivePermanent: Record<string, any>,
         @PaginationQueryFilterInEnum('role', USER_DEFAULT_ROLE, ENUM_ROLE_TYPE)
         role: Record<string, any>
     ) {
         const find: Record<string, any> = {
             ..._search,
-            ...isActive,
             ...blocked,
-            ...inactivePermanent,
             ...role,
         };
 
