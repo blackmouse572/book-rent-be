@@ -118,6 +118,7 @@ export class UserService implements IUserService {
             role,
             address,
             blocked = false,
+            ...rest
         }: AddUserDto,
         { passwordHash, salt }: IAuthPassword,
         options?: IDatabaseCreateOptions
@@ -134,7 +135,13 @@ export class UserService implements IUserService {
         create.salt = salt;
         create.passwordAttempt = 0;
 
-        return this.userRepository.create<UserEntity>(create, options);
+        return this.userRepository.create<UserEntity>(
+            {
+                ...rest,
+                ...create,
+            },
+            options
+        );
     }
 
     async existByEmail(
