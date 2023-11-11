@@ -19,6 +19,7 @@ import { HelpersModule } from './common/helpers/helpers.module';
 import { OrderModule } from './order/order.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { UserModule } from './user/user.module';
+import { VNPayModule } from 'src/common/vnpay/vnpay.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -94,6 +95,8 @@ import { UserModule } from './user/user.module';
                 CLOUDINARY_NAME: Joi.string().required(),
                 CLOUDINARY_API_KEY: Joi.string().required(),
                 CLOUDINARY_API_SECRET: Joi.string().required(),
+                VNPAY_TMNCODE: Joi.string().required(),
+                VNPAY_HASHSECRET: Joi.string().required(),
             }),
             validationOptions: {
                 allowUnknown: true,
@@ -116,6 +119,7 @@ import { UserModule } from './user/user.module';
         TransactionModule,
         CategoryModule, // Integration of the CategoryModule
         ReviewModule,
+        VNPayModule,
     ],
     controllers: [AppController],
     providers: [AppService],

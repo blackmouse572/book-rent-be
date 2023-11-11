@@ -5,6 +5,7 @@ import { BookModule } from 'src/book/book.module';
 import { DATABASE_CONNECTION_NAME } from 'src/common/database/constants/database.constraint';
 import { HelpersModule } from 'src/common/helpers/helpers.module';
 import { PaginationModule } from 'src/common/pagination/pagination.module';
+import { VNPayModule } from 'src/common/vnpay/vnpay.module';
 import { OrderController } from 'src/order/controllers/order.controller';
 import { OrderManageController } from 'src/order/controllers/order.manage.controller';
 import {
@@ -53,6 +54,7 @@ import { UserModule } from 'src/user/user.module';
         PaginationModule,
         HelpersModule,
         UserModule,
+        VNPayModule,
     ],
 })
 export class OrderModule {}

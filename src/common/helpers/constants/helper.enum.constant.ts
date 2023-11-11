@@ -16,6 +16,7 @@ export enum ENUM_HELPER_DATE_FORMAT {
     MINUTE_SHORT = 'm',
     SECOND_LONG = 'ss',
     SECOND_SHORT = 's',
+    LONG_STRING_DATE_TIME = 'YYYYMMDDHHmmss',
 }
 
 export enum ENUM_HELPER_DATE_DIFF {

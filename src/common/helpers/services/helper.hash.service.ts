@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
-import { SHA256, enc } from 'crypto-js';
+import { SHA256, enc, HmacSHA512 } from 'crypto-js';
+import CryptoJS from 'crypto-js';
 import { IHelperHashService } from 'src/common/helpers/interfaces/helper.hash-service';
 
 @Injectable()
@@ -23,5 +24,11 @@ export class HelperHashService implements IHelperHashService {
 
     sha256Compare(hashOne: string, hashTwo: string): boolean {
         return hashOne === hashTwo;
+    }
+
+    signHMACSHA512(data: string, secret: string): string {
+        const hmac = HmacSHA512(data, secret);
+
+        return hmac.toString(CryptoJS.enc.Hex);
     }
 }
