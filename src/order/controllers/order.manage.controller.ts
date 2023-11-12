@@ -164,6 +164,33 @@ export class OrderManageController {
         return order.save();
     }
 
+    @ApiOperation({
+        summary: 'Penalty an order',
+        description: `If user return book late or damage book, penalty them. This will update order status to ${ENUM_ORDER_STATUS.RETURNED}`,
+    })
+    @AuthJwtAdminAccessProtected()
+    @Put('/penalty/:id')
+    @RequestParamGuard(OrderRequestDto)
+    async penalty(@Param('id') orderId: string, @Body() dto: PenaltyOrderDto) {
+        const { penalty, penaltyReason } = dto;
+        const order = await this.orderService.findOneById(orderId);
+        if (!order) {
+            throw new NotFoundException('Order not found');
+        }
+
+        if (penalty > order.totalPrice) {
+            throw new BadRequestException(
+                'Penalty cannot be greater than total price'
+            );
+        }
+
+        order.penalty = penalty;
+        order.penaltyReason = penaltyReason;
+        order.status = ENUM_ORDER_STATUS.RETURNED;
+
+        return order.save();
+    }
+
     @Put(':id/:status')
     @AuthJwtAdminAccessProtected()
     @RequestParamGuard(OrderUpdateStatusRequestDto)
@@ -199,33 +226,6 @@ export class OrderManageController {
         }
 
         return this.orderService.findOneById(id);
-    }
-
-    @ApiOperation({
-        summary: 'Penalty an order',
-        description: `If user return book late or damage book, penalty them. This will update order status to ${ENUM_ORDER_STATUS.RETURNED}`,
-    })
-    @AuthJwtAdminAccessProtected()
-    @Put('/penalty/:id')
-    @RequestParamGuard(OrderRequestDto)
-    async penalty(@Param('id') orderId: string, @Body() dto: PenaltyOrderDto) {
-        const { penalty, penaltyReason } = dto;
-        const order = await this.orderService.findOneById(orderId);
-        if (!order) {
-            throw new NotFoundException('Order not found');
-        }
-
-        if (penalty > order.totalPrice) {
-            throw new BadRequestException(
-                'Penalty cannot be greater than total price'
-            );
-        }
-
-        order.penalty = penalty;
-        order.penaltyReason = penaltyReason;
-        order.status = ENUM_ORDER_STATUS.RETURNED;
-
-        return order.save();
     }
 
     validateUpdateOrderDetails(
