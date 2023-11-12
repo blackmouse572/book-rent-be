@@ -16,6 +16,9 @@ import { UserDoc } from 'src/user/repository/user.entity';
 
 @Injectable()
 export class TransactionService {
+    findOne(find: Record<string, any>, option?: IDatabaseFindOneOptions) {
+        return this.transactionRepository.findOne(find, option);
+    }
     constructor(
         private readonly transactionRepository: TransactionRepository
     ) {}
