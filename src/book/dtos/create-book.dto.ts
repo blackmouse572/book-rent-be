@@ -4,6 +4,7 @@ import { Transform, Type } from 'class-transformer';
 import {
     ArrayNotEmpty,
     IsArray,
+    IsEnum,
     IsNotEmpty,
     IsNumber,
     IsOptional,
@@ -11,6 +12,7 @@ import {
     MaxLength,
     Min,
 } from 'class-validator';
+import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
 
 export class CreateBookDto {
     @ApiProperty({
@@ -86,6 +88,22 @@ export class CreateBookDto {
     @IsString()
     @MaxLength(50)
     readonly author: string;
+
+    @ApiProperty({
+        enum: BOOK_STATUS_ENUM,
+    })
+    @IsNotEmpty()
+    @IsEnum(BOOK_STATUS_ENUM)
+    readonly status: BOOK_STATUS_ENUM;
+
+    @ApiProperty({
+        example: faker.lorem.paragraph(),
+        required: true,
+    })
+    @IsNotEmpty()
+    @IsString()
+    @MaxLength(500)
+    readonly statusDescription: string;
 
     @ApiProperty({
         type: 'string',

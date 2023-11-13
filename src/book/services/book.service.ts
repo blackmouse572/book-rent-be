@@ -43,6 +43,7 @@ export class BookService {
         bookDoc.name = dto.name;
         bookDoc.rental_price = dto.rental_price;
         bookDoc.status = dto.status;
+        bookDoc.statusDescription = dto.statusDescription;
         console.log(dto);
         return this.bookRepository.save(bookDoc, options);
     }
@@ -100,7 +101,8 @@ export class BookService {
         entity.keyword = dto.keyword;
         entity.name = dto.name;
         entity.rental_price = dto.rental_price;
-        entity.status = BOOK_STATUS_ENUM.ENABLE;
+        entity.status = dto.status;
+        entity.statusDescription = dto.statusDescription;
 
         return await this.bookRepository.create(entity, options);
     }
@@ -112,20 +114,20 @@ export class BookService {
         }
         return this.bookRepository.softDelete(book, options);
     }
-    active(
-        repository: BookDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<BookDoc> {
-        repository.status = BOOK_STATUS_ENUM.ENABLE;
-        return this.bookRepository.save(repository, options);
-    }
-    inactive(
-        repository: BookDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<BookDoc> {
-        repository.status = BOOK_STATUS_ENUM.DISABLE;
-        return this.bookRepository.save(repository, options);
-    }
+    // active(
+    //     repository: BookDoc,
+    //     options?: IDatabaseSaveOptions
+    // ): Promise<BookDoc> {
+    //     repository.status = BOOK_STATUS_ENUM.ENABLE;
+    //     return this.bookRepository.save(repository, options);
+    // }
+    // inactive(
+    //     repository: BookDoc,
+    //     options?: IDatabaseSaveOptions
+    // ): Promise<BookDoc> {
+    //     repository.status = BOOK_STATUS_ENUM.DISABLE;
+    //     return this.bookRepository.save(repository, options);
+    // }
 
     deleteMany(
         find: Record<string, any>,
@@ -134,20 +136,20 @@ export class BookService {
         return this.bookRepository.deleteMany(find, options);
     }
 
-    async changeStatus(
-        repository: BookDoc,
-        options?: IDatabaseSaveOptions
-    ): Promise<BookDoc> {
-        if (repository.status === BOOK_STATUS_ENUM.DISABLE) {
-            repository.status = BOOK_STATUS_ENUM.ENABLE;
-        } else {
-            repository.status = BOOK_STATUS_ENUM.DISABLE;
-        }
-        return this.bookRepository.save(repository, options);
-    }
-    async checkBookExist(id: string): Promise<boolean> {
-        return this.bookRepository.exists({ _id: id });
-    }
+    // async changeStatus(
+    //     repository: BookDoc,
+    //     options?: IDatabaseSaveOptions
+    // ): Promise<BookDoc> {
+    //     if (repository.status === BOOK_STATUS_ENUM.DISABLE) {
+    //         repository.status = BOOK_STATUS_ENUM.ENABLE;
+    //     } else {
+    //         repository.status = BOOK_STATUS_ENUM.DISABLE;
+    //     }
+    //     return this.bookRepository.save(repository, options);
+    // }
+    // async checkBookExist(id: string): Promise<boolean> {
+    //     return this.bookRepository.exists({ _id: id });
+    // }
 
     async checkManyBookExist(ids: string[]): Promise<boolean> {
         const objectIds = ids.map((id) => new mongoose.Types.ObjectId(id));

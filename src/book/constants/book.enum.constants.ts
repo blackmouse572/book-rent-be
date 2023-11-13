@@ -1,4 +1,5 @@
 export enum BOOK_STATUS_ENUM {
-    ENABLE = 'ENABLE',
-    DISABLE = 'DISABLE',
+    NEW = 'NEW',
+    LIKE_NEW = 'LIKE_NEW',
+    DAMAGED = 'DAMAGED',
 }
