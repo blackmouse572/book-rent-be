@@ -52,12 +52,19 @@ export class BookEntity extends DatabaseMongoObjectIdEntityAbstract {
     @Prop({
         required: true,
         trim: true,
-        default: BOOK_STATUS_ENUM.ENABLE,
         enum: BOOK_STATUS_ENUM,
         type: String,
         maxlength: 15,
     })
     status: BOOK_STATUS_ENUM;
+
+    @Prop({
+        required: true,
+        trim: true,
+        type: String,
+        maxlength: 500,
+    })
+    statusDescription: string;
 
     @Prop({
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ReviewEntity' }],

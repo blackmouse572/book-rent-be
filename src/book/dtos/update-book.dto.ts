@@ -50,6 +50,7 @@ export class UpdateBookDto {
     })
     @IsNotEmpty()
     @IsString()
+    @MaxLength(1000)
     readonly description: string;
 
     @ApiProperty({
@@ -91,4 +92,13 @@ export class UpdateBookDto {
     @IsNotEmpty()
     @IsEnum(BOOK_STATUS_ENUM)
     readonly status: BOOK_STATUS_ENUM;
+
+    @ApiProperty({
+        example: faker.lorem.paragraph(),
+        required: true,
+    })
+    @IsNotEmpty()
+    @IsString()
+    @MaxLength(500)
+    readonly statusDescription: string;
 }

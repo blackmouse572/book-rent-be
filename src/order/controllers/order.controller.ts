@@ -71,7 +71,6 @@ export class OrderController {
         );
         const books = await this.bookService.findAll({
             _id: { $in: booksIds },
-            status: BOOK_STATUS_ENUM.ENABLE,
         });
 
         if (books.length !== booksIds.length) {

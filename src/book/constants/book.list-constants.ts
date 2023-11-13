@@ -11,4 +11,4 @@ export const BOOK_DEFAULT_AVAILABLE_ORDER_BY = [
     'createdAt',
 ];
 export const BOOK_DEFAULT_AVAILABLE_SEARCH = ['keyword', 'name'];
-export const BOOK_DEFAULT_STATUS = BOOK_STATUS_ENUM.ENABLE;
+export const BOOK_DEFAULT_STATUS = Object.values(BOOK_STATUS_ENUM);

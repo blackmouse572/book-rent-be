@@ -60,7 +60,6 @@ export class BookController {
         @UploadedFile() file: Express.Multer.File
     ): Promise<BookDoc> {
         const categorys: CategoryDoc[] = [];
-
         for (const id of dto.category) {
             const category = await this.categoryService.findOneById(id);
             if (!category)
@@ -140,9 +139,6 @@ export class BookController {
         if (!result) {
             throw new NotFoundException({ message: 'book not found' });
         }
-        if (result.status === BOOK_STATUS_ENUM.DISABLE){
-            throw new ForbiddenException({message: 'Book is disabled'})
-        }
         return result.populate([
             'category',
             {
@@ -178,18 +174,17 @@ export class BookController {
         tags: ['book'],
         description: 'Change book status by Id',
     })
-    @AuthJwtAdminAccessProtected()
-    @Put('status/:id')
-    async changeStatus(@Param('id') id: string) {
-        const bookDoc = await this.bookService.findOneById(id);
-        if (!bookDoc) {
-            throw new NotFoundException(`Cannot found book with id: ${id}`);
-        }
+    // @AuthJwtAdminAccessProtected()
+    // @Put('status/:id')
+    // async changeStatus(@Param('id') id: string) {
+    //     const bookDoc = await this.bookService.findOneById(id);
+    //     if (!bookDoc) {
+    //         throw new NotFoundException(`Cannot found book with id: ${id}`);
+    //     }
 
-        const result = await this.bookService.changeStatus(bookDoc);
-        return result.populate('category');
-    }
-
+    //     const result = await this.bookService.changeStatus(bookDoc);
+    //     return result.populate('category');
+    // }
     @ApiOperation({
         tags: ['book'],
         description: 'update book by Id',
