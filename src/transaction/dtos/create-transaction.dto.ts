@@ -1,11 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-    IsMongoId,
-    IsNotEmpty,
-    IsNumber,
-    Min
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
+import { TRANSACTION_TYPE_ENUM } from 'src/transaction/constants/transaction.enum';
 
 export class CreateTransactionDto {
     @ApiProperty({
@@ -13,7 +9,7 @@ export class CreateTransactionDto {
         required: true,
     })
     @IsNotEmpty()
-    @IsMongoId()
+    @IsString()
     orderId: string;
 
     @ApiProperty({
@@ -24,5 +20,15 @@ export class CreateTransactionDto {
     @IsNumber()
     @Min(1)
     amount: number;
-}
 
+    @ApiProperty({
+        required: true,
+    })
+    @IsNotEmpty()
+    @IsString()
+    payDateStamp: string;
+
+    @IsNotEmpty()
+    @IsEnum(TRANSACTION_TYPE_ENUM)
+    readonly type: TRANSACTION_TYPE_ENUM;
+}

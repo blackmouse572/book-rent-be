@@ -1,0 +1,4 @@
+export enum TRANSACTION_TYPE_ENUM {
+    CHECKOUT = 'CHECKOUT',
+    PENALTY = 'PENALTY',
+}
