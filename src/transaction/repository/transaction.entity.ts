@@ -6,6 +6,7 @@ import mongoose, {
 import { DatabaseMongoObjectIdEntityAbstract } from 'src/common/database/abstracts/mongo/entities/database.mongo.object-id.entity.abstract';
 import { DatabaseEntity } from 'src/common/database/decorators/database.decorator';
 import { OrderEntity } from 'src/order/repositories/order.entity';
+import { TRANSACTION_TYPE_ENUM } from 'src/transaction/constants/transaction.enum';
 import { UserEntity } from 'src/user/repository/user.entity';
 
 export const TransactionDatabaseName = 'Transactions';
@@ -31,6 +32,19 @@ export class TransactionEntity extends DatabaseMongoObjectIdEntityAbstract {
         required: true,
     })
     amount: number;
+
+    @Prop({
+        type: String,
+        required: true,
+    })
+    payDateStamp: string;
+
+    @Prop({
+        type: String,
+        enum: TRANSACTION_TYPE_ENUM,
+        required: true,
+    })
+    type: TRANSACTION_TYPE_ENUM;
 }
 
 export const TransactionSchema =

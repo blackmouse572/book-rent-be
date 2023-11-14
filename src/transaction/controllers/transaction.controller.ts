@@ -5,16 +5,15 @@ import {
     Get,
     Ip,
     NotFoundException,
-    Param,
     Post,
-    Request,
 } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import {
     AuthJwtAccessProtected,
     AuthJwtAdminAccessProtected,
 } from 'src/auth/decorators/auth.jwt.decorator';
-import { BookDoc } from 'src/book/repository/book.entity';
+import { HelperEncryptionService } from 'src/common/helpers/services/helper.encryption.service';
+import { HelperHashService } from 'src/common/helpers/services/helper.hash.service';
 import { PaginationQuery } from 'src/common/pagination/decorators/pagination.decorator';
 import { PaginationListDto } from 'src/common/pagination/dto/pagination.list.dto';
 import { PaginationService } from 'src/common/pagination/services/pagination.service';
@@ -44,7 +43,9 @@ export class TransactionController {
         private readonly paginationService: PaginationService,
         private readonly transactionService: TransactionService,
         private readonly orderService: OrderService,
-        private readonly vnpayService: VNPayGatewayService
+        private readonly vnpayService: VNPayGatewayService,
+        private readonly hashService: HelperHashService,
+        private readonly encryptService: HelperEncryptionService
     ) {}
 
     @ApiOperation({
@@ -58,16 +59,20 @@ export class TransactionController {
         @Body() dto: CreateTransactionDto,
         @GetUser() user: UserDoc
     ): Promise<TransactionDoc> {
-        const order = await this.orderService.findOneById(dto.orderId);
+        const decryptId = this.encryptService.base64Decrypt(dto.orderId);
+
+        const order = await this.orderService.findOneById(decryptId);
 
         if (!order) {
             throw new NotFoundException({
-                message: `Can not find order with id: ${dto.orderId}`,
+                message: `Can not find order with encrypted id: ${dto.orderId}`,
             });
         }
 
         const transaction = await this.transactionService.findOne({
             order: order,
+            type: dto.type,
+            payDateStamp: dto.payDateStamp,
         });
         if (transaction) {
             throw new BadRequestException('Order was already paid');
@@ -77,6 +82,10 @@ export class TransactionController {
         entity.user = user;
         entity.order = order;
         entity.amount = dto.amount;
+        entity.type = dto.type;
+        entity.payDateStamp = dto.payDateStamp;
+
+        console.log(entity);
 
         return await this.transactionService.create(entity);
     }
@@ -144,7 +153,7 @@ export class TransactionController {
             TRANSACTION_DEFAULT_AVAILABLE_SEARCH,
             TRANSACTION_DEFAULT_AVAILABLE_ORDER_BY
         )
-        { _search, _limit, _offset, _order }: PaginationListDto,
+        { _limit, _offset, _order }: PaginationListDto,
         @GetUser() user: UserDoc
     ): Promise<{
         _pagination: { total: number; totalPage: number };
@@ -179,7 +188,7 @@ export class TransactionController {
 
     // @AuthJwtAccessProtected()
     @Post('checkoutUrl')
-    async getById(@Body() dto: GetCheckoutUrlDto, @Ip() ip): Promise<String> {
+    async getById(@Body() dto: GetCheckoutUrlDto, @Ip() ip): Promise<string> {
         const order = await this.orderService.findOneById(dto.orderId);
         if (!order) {
             throw new NotFoundException({
@@ -191,7 +200,7 @@ export class TransactionController {
             amount: dto.amount,
             ipAddr: ip,
             locale: ENUM_LOCALE.VN,
-            orderInfo: dto.orderId,
+            orderInfo: this.encryptService.base64Encrypt(dto.orderId),
             returnUrl: dto.returnUrl,
         });
     }

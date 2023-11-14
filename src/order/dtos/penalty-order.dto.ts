@@ -1,6 +1,12 @@
 import { faker } from '@faker-js/faker';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsNumber,
+    IsString,
+    MaxLength,
+    MinLength,
+} from 'class-validator';
 
 export class PenaltyOrderDto {
     @ApiProperty({
@@ -18,4 +24,13 @@ export class PenaltyOrderDto {
     @MinLength(10)
     @MaxLength(500)
     penaltyReason: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({
+        type: String,
+        description: 'URL to get the order results information',
+        example: faker.internet.url(),
+    })
+    returnUrl: string;
 }

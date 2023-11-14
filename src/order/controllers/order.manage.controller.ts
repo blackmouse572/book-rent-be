@@ -3,6 +3,7 @@ import {
     Body,
     Controller,
     Get,
+    Ip,
     NotFoundException,
     Param,
     Put,
@@ -12,6 +13,7 @@ import {
     AuthJwtAccessProtected,
     AuthJwtAdminAccessProtected,
 } from 'src/auth/decorators/auth.jwt.decorator';
+import { HelperEncryptionService } from 'src/common/helpers/services/helper.encryption.service';
 import {
     PaginationQuery,
     PaginationQueryFilterDate,
@@ -19,6 +21,8 @@ import {
 } from 'src/common/pagination/decorators/pagination.decorator';
 import { PaginationListDto } from 'src/common/pagination/dto/pagination.list.dto';
 import { PaginationService } from 'src/common/pagination/services/pagination.service';
+import { ENUM_LOCALE } from 'src/common/vnpay/constants/locale.enum';
+import { VNPayGatewayService } from 'src/common/vnpay/services/vnpay-gateway.service';
 import { RequestParamGuard } from 'src/lib/guards/request.decorator';
 import {
     ORDER_DEFAULT_AVAILABLE_ORDER_BY,
@@ -53,7 +57,9 @@ export class OrderManageController {
     constructor(
         private readonly orderService: OrderService,
         private readonly paginationService: PaginationService,
-        private readonly mailService: SendgridService
+        private readonly mailService: SendgridService,
+        private readonly vnpayService: VNPayGatewayService,
+        private readonly encryptService: HelperEncryptionService
     ) {}
 
     @ApiOperation({
@@ -174,7 +180,11 @@ export class OrderManageController {
     @AuthJwtAdminAccessProtected()
     @Put('/penalty/:id')
     @RequestParamGuard(OrderRequestDto)
-    async penalty(@Param('id') orderId: string, @Body() dto: PenaltyOrderDto) {
+    async penalty(
+        @Param('id') orderId: string,
+        @Body() dto: PenaltyOrderDto,
+        @Ip() ip
+    ) {
         const { penalty, penaltyReason } = dto;
         const order = await this.orderService.findOneById(orderId, {
             join: {
@@ -195,12 +205,20 @@ export class OrderManageController {
 
         order.penalty = penalty;
         order.penaltyReason = penaltyReason;
-        console.log(order);
+        // console.log(order);
         // order.status = ENUM_ORDER_STATUS.RETURNED;
-        const paymentLink = 'sdas';
+        const paymentLink = await this.vnpayService.createPaymentLink({
+            amount: dto.penalty,
+            ipAddr: ip,
+            locale: ENUM_LOCALE.VN,
+            orderInfo: this.encryptService.base64Encrypt(orderId),
+            returnUrl: dto.returnUrl,
+        });
+        console.log(paymentLink);
         this.mailService.sendPenantyEmail(
             { order, paymentLink },
-            order.userId.email
+            'phuoctungpbc02@gmail.com'
+            // order.userId.email
         );
 
         return order.save();
