@@ -217,8 +217,7 @@ export class OrderManageController {
         console.log(paymentLink);
         this.mailService.sendPenantyEmail(
             { order, paymentLink },
-            'phuoctungpbc02@gmail.com'
-            // order.userId.email
+            order.userId.email
         );
 
         return order.save();
