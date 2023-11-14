@@ -13,7 +13,6 @@ import {
     AuthJwtPayload,
     AuthUserId,
 } from 'src/auth/decorators/auth.jwt.decorator';
-import { BOOK_STATUS_ENUM } from 'src/book/constants/book.enum.constants';
 import { BookEntity } from 'src/book/repository/book.entity';
 import { BookService } from 'src/book/services/book.service';
 import {

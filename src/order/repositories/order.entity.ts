@@ -25,8 +25,6 @@ export class OrderEntity extends DatabaseMongoObjectIdEntityAbstract {
         type: mongoose.Schema.Types.ObjectId,
         ref: UserEntity.name,
         required: true,
-        autopopulate: false,
-        alias: 'user_id',
     })
     userId: UserEntity;
 

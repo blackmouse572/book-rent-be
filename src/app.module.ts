@@ -20,6 +20,7 @@ import { OrderModule } from './order/order.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { UserModule } from './user/user.module';
 import { VNPayModule } from 'src/common/vnpay/vnpay.module';
+import { SendgridModule } from './sendgrid/sendgrid.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -120,6 +121,7 @@ import { VNPayModule } from 'src/common/vnpay/vnpay.module';
         CategoryModule, // Integration of the CategoryModule
         ReviewModule,
         VNPayModule,
+        SendgridModule,
     ],
     controllers: [AppController],
     providers: [AppService],

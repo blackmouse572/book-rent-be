@@ -41,6 +41,8 @@ import {
 import { UpdateOrderBasicDto } from 'src/order/dtos/update-order-basic.dto';
 import { OrderDocument } from 'src/order/repositories/order.entity';
 import { OrderService } from 'src/order/services/order.service';
+import { SendgridService } from 'src/sendgrid/sendgrid.service';
+import { UserEntity } from 'src/user/repository/user.entity';
 
 @ApiTags('modules.admin.orders')
 @Controller({
@@ -50,7 +52,8 @@ import { OrderService } from 'src/order/services/order.service';
 export class OrderManageController {
     constructor(
         private readonly orderService: OrderService,
-        private readonly paginationService: PaginationService
+        private readonly paginationService: PaginationService,
+        private readonly mailService: SendgridService
     ) {}
 
     @ApiOperation({
@@ -173,7 +176,13 @@ export class OrderManageController {
     @RequestParamGuard(OrderRequestDto)
     async penalty(@Param('id') orderId: string, @Body() dto: PenaltyOrderDto) {
         const { penalty, penaltyReason } = dto;
-        const order = await this.orderService.findOneById(orderId);
+        const order = await this.orderService.findOneById(orderId, {
+            join: {
+                path: 'userId',
+                model: UserEntity.name,
+                select: 'userName fullName email',
+            },
+        });
         if (!order) {
             throw new NotFoundException('Order not found');
         }
@@ -186,7 +195,13 @@ export class OrderManageController {
 
         order.penalty = penalty;
         order.penaltyReason = penaltyReason;
-        order.status = ENUM_ORDER_STATUS.RETURNED;
+        console.log(order);
+        // order.status = ENUM_ORDER_STATUS.RETURNED;
+        const paymentLink = 'sdas';
+        this.mailService.sendPenantyEmail(
+            { order, paymentLink },
+            order.userId.email
+        );
 
         return order.save();
     }

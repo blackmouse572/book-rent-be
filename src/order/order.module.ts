@@ -17,6 +17,7 @@ import { OrderEntity, OrderSchema } from 'src/order/repositories/order.entity';
 import { OrderRepository } from 'src/order/repositories/order.repository';
 import { OrderCartService } from 'src/order/services/order-cart.service';
 import { OrderService } from 'src/order/services/order.service';
+import { SendgridModule } from 'src/sendgrid/sendgrid.module';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
@@ -55,6 +56,7 @@ import { UserModule } from 'src/user/user.module';
         HelpersModule,
         UserModule,
         VNPayModule,
+        SendgridModule,
     ],
 })
 export class OrderModule {}
