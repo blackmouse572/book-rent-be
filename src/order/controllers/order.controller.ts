@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Get,
@@ -65,6 +66,16 @@ export class OrderController {
     ) {
         const { _id: userId } = payload;
         const { rentalDate, returnDate, cart: _cart } = placeOrder;
+
+        const parsedRentalDate = new Date(rentalDate);
+        const parsedReturnDate = new Date(returnDate);
+        if (
+            isNaN(parsedRentalDate.getTime()) ||
+            isNaN(parsedReturnDate.getTime())
+        ) {
+            throw new BadRequestException('Invalid date format');
+        }
+
         const booksIds = _cart.map(
             (item) => new mongoose.Types.ObjectId(item.bookId)
         );
@@ -81,7 +92,12 @@ export class OrderController {
                 'Rental date must be less than return date'
             );
         }
-        const total_price = this.calculatePrice(books, _cart);
+        const total_price = this.calculatePrice(
+            books,
+            _cart,
+            parsedRentalDate,
+            parsedReturnDate
+        );
         const carts = await this.orderCartService.createMany(
             _cart.map((item) => ({
                 book: item.bookId,
@@ -187,14 +203,29 @@ export class OrderController {
 
     calculatePrice(
         books: BookEntity[],
-        cart: { bookId: string; quantity: number }[]
+        cart: { bookId: string; quantity: number }[],
+        rentalDate: Date,
+        returnDate: Date
     ) {
         let totalPrice = 0;
+        if (!(rentalDate instanceof Date) || !(returnDate instanceof Date)) {
+            throw new Error('Invalid date objects');
+        }
+
+        const rentalDuration = returnDate.getTime() - rentalDate.getTime();
+        const millisecondsInOneDay = 24 * 60 * 60 * 1000;
+
+        const rentalDays = rentalDuration / millisecondsInOneDay;
+
         books.forEach((book) => {
             const cartItem = cart.find(
                 (item) => item.bookId === book._id.toString()
             );
-            totalPrice += book.rental_price * cartItem.quantity;
+
+            if (cartItem && cartItem.quantity > 0) {
+                totalPrice +=
+                    book.rental_price * cartItem.quantity * rentalDays;
+            }
         });
 
         return totalPrice;
